@@ -11,9 +11,10 @@ import { getSavedRecipes, unsaveRecipe } from '../lib/storage';
 interface SavedRecipesDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onRecipeClick?: (recipe: Recipe) => void;
 }
 
-export function SavedRecipesDrawer({ isOpen, onClose }: SavedRecipesDrawerProps) {
+export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedRecipesDrawerProps) {
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
 
   // Load saved recipes when drawer opens
@@ -120,7 +121,8 @@ export function SavedRecipesDrawer({ isOpen, onClose }: SavedRecipesDrawerProps)
               {savedRecipes.map((recipe) => (
                 <div
                   key={recipe.id}
-                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-primary transition-colors"
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-primary transition-colors cursor-pointer"
+                  onClick={() => onRecipeClick?.(recipe)}
                 >
                   {/* Recipe header */}
                   <div className="flex justify-between items-start mb-2">
@@ -128,7 +130,10 @@ export function SavedRecipesDrawer({ isOpen, onClose }: SavedRecipesDrawerProps)
                       {recipe.title}
                     </h3>
                     <button
-                      onClick={() => handleRemoveRecipe(recipe.id)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering the card click
+                        handleRemoveRecipe(recipe.id);
+                      }}
                       className="p-1 rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       aria-label={`Remove ${recipe.title} from favorites`}
                       title="Remove from favorites"
@@ -182,8 +187,13 @@ export function SavedRecipesDrawer({ isOpen, onClose }: SavedRecipesDrawerProps)
                   </div>
 
                   {/* Quick ingredient count */}
-                  <div className="mt-2 text-xs text-gray-500">
-                    {recipe.ingredients.length} ingredients • {recipe.instructions.length} steps
+                  <div className="mt-2 flex justify-between items-center">
+                    <div className="text-xs text-gray-500">
+                      {recipe.ingredients.length} ingredients • {recipe.instructions.length} steps
+                    </div>
+                    <div className="text-xs text-primary font-medium">
+                      Click to view recipe →
+                    </div>
                   </div>
                 </div>
               ))}

@@ -3,7 +3,7 @@
  * Displays individual recipe information with save functionality
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, ChefHat, Heart } from 'lucide-react';
 import { Recipe } from '../lib/ai';
 import { saveRecipe, unsaveRecipe, isRecipeSaved } from '../lib/storage';
@@ -14,10 +14,15 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
-  const [isSaved, setIsSaved] = useState(isRecipeSaved(recipe.id));
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
-  const handleSaveToggle = () => {
+  // Check saved status when recipe changes
+  useEffect(() => {
+    setIsSaved(isRecipeSaved(recipe.id));
+  }, [recipe.id]);
+
+  const handleSaveToggle = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card click
     const newSavedState = !isSaved;
     
     if (newSavedState) {
@@ -62,7 +67,7 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
   };
 
   return (
-    <div className="card group">
+    <div className="card group hover:shadow-lg transition-shadow duration-200">
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <h3 className="text-xl font-semibold text-gray-800 group-hover:text-primary transition-colors">
@@ -89,7 +94,7 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
       </div>
 
       {/* Description */}
-      <p className="text-gray-600 mb-4 leading-relaxed">
+      <p className="text-gray-600 mb-4 leading-relaxed line-clamp-2">
         {recipe.description}
       </p>
 
@@ -116,53 +121,11 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
       {/* Dietary badges */}
       {getDietaryBadges()}
 
-      {/* Expandable content */}
-      <div className="mt-4">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full text-left text-primary font-medium hover:text-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
-          aria-expanded={isExpanded}
-        >
-          {isExpanded ? 'Hide Details' : 'Show Details'}
-        </button>
-
-        {isExpanded && (
-          <div className="mt-4 space-y-4 border-t pt-4">
-            {/* Ingredients */}
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                Ingredients
-              </h4>
-              <ul className="space-y-1">
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index} className="text-gray-600 text-sm flex items-start">
-                    <span className="text-gray-400 mr-2">•</span>
-                    {ingredient}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Instructions */}
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
-                <span className="w-2 h-2 bg-secondary rounded-full mr-2"></span>
-                Instructions
-              </h4>
-              <ol className="space-y-2">
-                {recipe.instructions.map((instruction, index) => (
-                  <li key={index} className="text-gray-600 text-sm flex">
-                    <span className="bg-secondary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium mr-3 mt-0.5 flex-shrink-0">
-                      {index + 1}
-                    </span>
-                    <span className="leading-relaxed">{instruction}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-        )}
+      {/* Click hint */}
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <p className="text-sm text-gray-500 group-hover:text-primary transition-colors">
+          Click to view full recipe →
+        </p>
       </div>
     </div>
   );

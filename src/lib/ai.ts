@@ -22,19 +22,33 @@ export interface DietaryPreferences {
   dairyFree: boolean;
 }
 
+export interface CuisinePreferences {
+  selectedCuisine: string;
+  customCuisine: string;
+}
+
 // Mock data for demonstrations and fallback
 const MOCK_INGREDIENTS = [
   'chicken breast', 'broccoli', 'carrots', 'onion', 'garlic',
   'olive oil', 'salt', 'pepper', 'rice', 'cheese', 'eggs', 'milk'
 ];
 
-const MOCK_RECIPES: Recipe[] = [
+// Function to generate unique recipe IDs
+function generateRecipeId(): string {
+  return `recipe_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+const createMockRecipe = (baseRecipe: Omit<Recipe, 'id'>): Recipe => ({
+  ...baseRecipe,
+  id: generateRecipeId()
+});
+
+const MOCK_RECIPE_TEMPLATES = [
   {
-    id: '1',
     title: 'One-Pan Chicken and Vegetables',
     description: 'A healthy and delicious meal with tender chicken and fresh vegetables.',
     cookTime: '25 mins',
-    difficulty: 'easy',
+    difficulty: 'easy' as const,
     ingredients: [
       '2 chicken breasts, sliced',
       '1 cup broccoli florets',
@@ -55,11 +69,10 @@ const MOCK_RECIPES: Recipe[] = [
     dietary: []
   },
   {
-    id: '2',
     title: 'Vegetable Fried Rice',
     description: 'Quick and tasty fried rice packed with fresh vegetables.',
     cookTime: '15 mins',
-    difficulty: 'easy',
+    difficulty: 'easy' as const,
     ingredients: [
       '2 cups cooked rice',
       '1 cup mixed vegetables (broccoli, carrots)',
@@ -80,11 +93,10 @@ const MOCK_RECIPES: Recipe[] = [
     dietary: ['vegetarian']
   },
   {
-    id: '3',
     title: 'Garlic Herb Roasted Vegetables',
     description: 'Perfectly roasted vegetables with aromatic herbs.',
     cookTime: '30 mins',
-    difficulty: 'easy',
+    difficulty: 'easy' as const,
     ingredients: [
       '1 cup broccoli florets',
       '2 carrots, chopped',
@@ -217,7 +229,8 @@ export async function detectIngredientsFromImage(imageFile: File): Promise<strin
  */
 export async function generateRecipes(
   ingredients: string[], 
-  preferences: DietaryPreferences
+  preferences: DietaryPreferences,
+  cuisinePrefs?: CuisinePreferences
 ): Promise<Recipe[]> {
   const isMockMode = import.meta.env.VITE_MOCK === 'true';
   
@@ -225,8 +238,40 @@ export async function generateRecipes(
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Filter mock recipes based on dietary preferences
-    return MOCK_RECIPES.filter(recipe => {
+    // Create fresh recipes with unique IDs each time
+    const recipesToFilter = MOCK_RECIPE_TEMPLATES.map(template => createMockRecipe(template));
+    
+    if (cuisinePrefs && cuisinePrefs.selectedCuisine && cuisinePrefs.selectedCuisine !== 'Any Cuisine') {
+      const selectedCuisine = cuisinePrefs.selectedCuisine === 'Other' && cuisinePrefs.customCuisine 
+        ? cuisinePrefs.customCuisine 
+        : cuisinePrefs.selectedCuisine;
+      
+      // Add cuisine-specific variations with unique IDs
+      if (selectedCuisine.toLowerCase().includes('italian')) {
+        recipesToFilter.push(createMockRecipe({
+          title: 'Italian Herb Frittata',
+          description: 'A classic Italian egg dish with fresh herbs and cheese.',
+          cookTime: '20 mins',
+          difficulty: 'easy',
+          ingredients: ['6 eggs', '1/2 cup cheese', '2 tbsp olive oil', 'Fresh basil', 'Cherry tomatoes'],
+          instructions: ['Beat eggs with salt and pepper', 'Heat olive oil in oven-safe pan', 'Add herbs and tomatoes', 'Pour eggs and cook until set'],
+          dietary: ['vegetarian']
+        }));
+      } else if (selectedCuisine.toLowerCase().includes('chinese')) {
+        recipesToFilter.push(createMockRecipe({
+          title: 'Chinese Vegetable Stir-Fry',
+          description: 'Quick and flavorful stir-fried vegetables with soy sauce.',
+          cookTime: '15 mins',
+          difficulty: 'easy',
+          ingredients: ['Mixed vegetables', '2 tbsp soy sauce', '1 tbsp sesame oil', 'Garlic', 'Ginger'],
+          instructions: ['Heat oil in wok', 'Add garlic and ginger', 'Stir-fry vegetables', 'Add soy sauce and serve'],
+          dietary: ['vegetarian']
+        }));
+      }
+    }
+    
+    // Filter recipes based on dietary preferences
+    return recipesToFilter.filter(recipe => {
       if (preferences.vegetarian && !recipe.dietary?.includes('vegetarian')) {
         return recipe.dietary?.includes('vegan'); // Vegan is also vegetarian
       }
@@ -267,10 +312,18 @@ export async function generateRecipes(
       .filter(Boolean)
       .join(', ');
 
+    // Get cuisine preference text
+    const cuisineText = cuisinePrefs && cuisinePrefs.selectedCuisine && cuisinePrefs.selectedCuisine !== 'Any Cuisine' 
+      ? cuisinePrefs.selectedCuisine === 'Other' && cuisinePrefs.customCuisine 
+        ? cuisinePrefs.customCuisine 
+        : cuisinePrefs.selectedCuisine
+      : '';
+
     const prompt = `
 Create 3-5 delicious and practical recipes using primarily these ingredients: ${ingredients.join(', ')}.
 
 ${dietaryText ? `IMPORTANT: All recipes must be ${dietaryText}.` : ''}
+${cuisineText ? `CUISINE STYLE: Focus on ${cuisineText} cuisine and cooking techniques.` : ''}
 
 Guidelines:
 - Each recipe should use at least 3 of the provided ingredients
@@ -278,11 +331,11 @@ Guidelines:
 - Provide clear, step-by-step instructions
 - Include common pantry items if needed (salt, pepper, oil, etc.)
 - Make recipes practical for home cooking
+${cuisineText ? `- Incorporate authentic ${cuisineText} flavors and techniques` : ''}
 
 Return ONLY a valid JSON array with this exact structure:
 [
   {
-    "id": "recipe_1",
     "title": "Recipe Name",
     "description": "Brief appetizing description (1-2 sentences)",
     "cookTime": "25 mins",
@@ -341,8 +394,11 @@ Dietary tags: "vegetarian", "vegan", "gluten-free", "dairy-free"
         throw new Error('Invalid response format');
       }
       
-      // Validate each recipe has required fields
-      const validRecipes = recipes.filter(recipe => 
+      // Validate each recipe has required fields and add unique IDs
+      const validRecipes = recipes.map((recipe) => ({
+        ...recipe,
+        id: recipe.id || generateRecipeId(), // Ensure unique ID
+      })).filter(recipe => 
         recipe.id && recipe.title && recipe.ingredients && recipe.instructions
       );
       

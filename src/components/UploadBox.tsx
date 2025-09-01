@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Upload, Image, Loader2 } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 
 interface UploadBoxProps {
   onImageUpload: (file: File) => void;
@@ -71,11 +71,11 @@ export function UploadBox({ onImageUpload, isLoading = false }: UploadBoxProps) 
   return (
     <div
       className={`
-        relative w-full max-w-md mx-auto p-8 border-2 border-dashed rounded-xl
+        relative w-full max-w-sm mx-auto p-8 border-2 border-dashed rounded-xl
         transition-all duration-200 cursor-pointer
         ${isDragOver 
-          ? 'border-primary bg-green-50' 
-          : 'border-gray-300 hover:border-primary hover:bg-gray-50'
+          ? 'border-green-400 bg-green-50' 
+          : 'border-green-300 hover:border-green-400 hover:bg-green-50/50'
         }
         ${isLoading ? 'pointer-events-none opacity-60' : ''}
       `}
@@ -107,31 +107,20 @@ export function UploadBox({ onImageUpload, isLoading = false }: UploadBoxProps) 
       <div className="text-center space-y-4">
         {isLoading ? (
           <>
-            <Loader2 className="w-12 h-12 mx-auto text-primary animate-spin" />
+            <Loader2 className="w-8 h-8 mx-auto text-green-600 animate-spin" />
             <div>
-              <p className="text-lg font-medium text-gray-700">Analyzing your fridge...</p>
-              <p className="text-sm text-gray-500">This may take a few seconds</p>
+              <p className="text-sm font-medium text-gray-700">Analyzing your fridge...</p>
             </div>
           </>
         ) : (
           <>
             <div className="flex justify-center">
-              {isDragOver ? (
-                <Image className="w-12 h-12 text-primary" />
-              ) : (
-                <Upload className="w-12 h-12 text-gray-400" />
-              )}
+              <Upload className="w-8 h-8 text-green-600" />
             </div>
             
             <div>
-              <h3 className="text-lg font-medium text-gray-700 mb-2">
-                {isDragOver ? 'Drop your photo here' : 'Upload your fridge photo'}
-              </h3>
-              <p className="text-sm text-gray-500">
-                Drag & drop an image or click to browse
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Supports: PNG, JPG, JPEG (max 10MB)
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Upload fridge photo
               </p>
             </div>
           </>
