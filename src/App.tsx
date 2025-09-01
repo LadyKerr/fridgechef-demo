@@ -332,45 +332,54 @@ function App() {
 
       case 'results':
         return (
-          <div className="max-w-6xl mx-auto space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-primary mb-4">
-                Here are your personalized recipes!
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Based on your ingredients and dietary preferences
-              </p>
-              
-              <button
-                onClick={handleStartOver}
-                className="btn-secondary mb-8"
-              >
-                Create New Recipes
-              </button>
-            </div>
+          <div className="min-h-screen py-8 px-4">
+            <div className="max-w-6xl mx-auto">
+              {/* Header Section */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 animate-fade-in" 
+                    style={{ textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}>
+                  Here are your personalized recipes!
+                </h1>
+                <p className="text-xl text-white/90 mb-8" 
+                   style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.2)' }}>
+                  Based on your ingredients and dietary preferences
+                </p>
+                
+                <button
+                  onClick={handleStartOver}
+                  className="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all duration-200 border-2 border-white/20 hover:border-white/30"
+                >
+                  <span className="relative z-10">Create New Recipes</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                </button>
+              </div>
 
-            {recipes.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No recipes found. Try adjusting your preferences or uploading a different image.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recipes.map((recipe) => (
-                  <div 
-                    key={recipe.id} 
-                    onClick={() => handleViewRecipe(recipe)}
-                    className="cursor-pointer"
-                  >
-                    <RecipeCard
-                      recipe={recipe}
-                      onSaveToggle={() => {
-                        // Optional: Could trigger a notification here
-                      }}
-                    />
+              {recipes.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 max-w-md mx-auto">
+                    <p className="text-white text-lg">No recipes found. Try adjusting your preferences or uploading a different image.</p>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recipes.map((recipe, index) => (
+                    <div 
+                      key={recipe.id} 
+                      onClick={() => handleViewRecipe(recipe)}
+                      className="cursor-pointer animate-fade-in-up"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <RecipeCard
+                        recipe={recipe}
+                        onSaveToggle={() => {
+                          // Optional: Could trigger a notification here
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         );
 
