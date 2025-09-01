@@ -114,7 +114,7 @@ function App() {
           <div className="max-w-md mx-auto text-center space-y-8">
             {/* Header */}
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold text-gray-800">
+              <h1 className="text-4xl font-semibold text-green-600">
                 FridgeChef
               </h1>
               <p className="text-lg text-gray-600">
