@@ -4,13 +4,14 @@
  */
 
 import { useState } from 'react';
-import { ChefHat, Loader2, ArrowLeft, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Lightbulb } from 'lucide-react';
 import { Header } from './components/Header';
 import { UploadBox } from './components/UploadBox';
 import { DietaryPrefs } from './components/DietaryPrefs';
 import { CuisinePrefs, type CuisinePreferences } from './components/CuisinePrefs';
 import { RecipeCard } from './components/RecipeCard';
 import { SavedRecipesDrawer } from './components/SavedRecipesDrawer';
+import { AnalysisLoadingScreen } from './components/AnalysisLoadingScreen';
 import { detectIngredientsFromImage, generateRecipes, type Recipe, type DietaryPreferences } from './lib/ai';
 
 // Application states
@@ -166,9 +167,9 @@ function App() {
                 {/* Generate Button */}
                 <button 
                   onClick={() => {
-                    // For demo purposes, skip directly to cuisine preferences with mock ingredients
+                    // Show the loading screen first, then proceed to cuisine preferences
                     setDetectedIngredients(['eggs', 'spinach', 'cheese', 'milk', 'bread']);
-                    setCurrentState('cuisine-preferences');
+                    setCurrentState('uploading');
                   }}
                   className="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transform transition-all duration-300"
                 >
@@ -207,21 +208,9 @@ function App() {
 
       case 'uploading':
         return (
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="bg-warm-600/10 p-6 rounded-full">
-                <Loader2 className="w-16 h-16 text-warm-600 animate-spin" />
-              </div>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-primary mb-2">
-                Analyzing Your Fridge
-              </h2>
-              <p className="text-warmGray">
-                Our AI is identifying ingredients from your photo...
-              </p>
-            </div>
-          </div>
+          <AnalysisLoadingScreen 
+            onComplete={() => setCurrentState('cuisine-preferences')}
+          />
         );
 
       case 'cuisine-preferences':
@@ -271,21 +260,10 @@ function App() {
 
       case 'generating':
         return (
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="bg-warm-700/10 p-6 rounded-full">
-                <ChefHat className="w-16 h-16 text-warm-700 animate-pulse" />
-              </div>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-primary mb-2">
-                Cooking Up Recipes
-              </h2>
-              <p className="text-warmGray">
-                Our AI chef is creating personalized recipes for you...
-              </p>
-            </div>
-          </div>
+          <AnalysisLoadingScreen 
+            mode="generating"
+            onComplete={() => setCurrentState('results')}
+          />
         );
 
       case 'results':
@@ -437,14 +415,16 @@ function App() {
 
   return (
     <>
-      {currentState === 'landing' ? (
-        // Full-screen landing page
+      {currentState === 'landing' || currentState === 'uploading' || currentState === 'generating' ? (
+        // Full-screen pages (landing, loading screens)
         <div className="min-h-screen">
-          <Header 
-            onLogoClick={handleStartOver}
-            onMyRecipesClick={() => setIsDrawerOpen(true)}
-            isMyRecipesActive={isDrawerOpen}
-          />
+          {currentState === 'landing' && (
+            <Header 
+              onLogoClick={handleStartOver}
+              onMyRecipesClick={() => setIsDrawerOpen(true)}
+              isMyRecipesActive={isDrawerOpen}
+            />
+          )}
           {renderContent()}
         </div>
       ) : (
