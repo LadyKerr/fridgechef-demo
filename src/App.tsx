@@ -35,6 +35,9 @@ function App() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkedIngredients, setCheckedIngredients] = useState<{ [key: number]: boolean }>({});
+  const [isSaved, setIsSaved] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Handle image upload and ingredient detection
   const handleImageUpload = async (file: File) => {
@@ -77,6 +80,8 @@ function App() {
     setRecipes([]);
     setSelectedRecipe(null);
     setError(null);
+    setCheckedIngredients({});
+    setIsSaved(false);
     setDietaryPreferences({
       vegetarian: false,
       vegan: false,
@@ -106,6 +111,26 @@ function App() {
   const handleBackFromRecipe = () => {
     setSelectedRecipe(null);
     setCurrentState('results');
+    setCheckedIngredients({});
+    setIsSaved(false);
+  };
+
+  // Handle ingredient checkbox toggle
+  const handleIngredientCheck = (index: number) => {
+    setIsAnimating(true);
+    setCheckedIngredients(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+    // Reset animation state
+    setTimeout(() => setIsAnimating(false), 200);
+  };
+
+  // Handle save recipe
+  const handleSaveRecipe = () => {
+    setIsSaved(true);
+    // Reset save state after animation
+    setTimeout(() => setIsSaved(false), 2000);
   };
 
   // Render different views based on current state
@@ -387,94 +412,146 @@ function App() {
         if (!selectedRecipe) return null;
         
         return (
-          <div className="max-w-2xl mx-auto space-y-6">
-            {/* Back button */}
-            <button
-              onClick={handleBackFromRecipe}
-              className="flex items-center space-x-2 text-warmGray hover:text-primary transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back to recipes</span>
-            </button>
-
-            {/* Recipe header */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <h1 className="text-3xl font-semibold text-primary">
-                  {selectedRecipe.title}
-                </h1>
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Header Card */}
+            <div className="bg-white rounded-xl shadow-lg border-t-4 border-orange-400 p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                {/* Back Button */}
                 <button
-                  className="p-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors"
+                  onClick={handleBackFromRecipe}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-orange-500 bg-orange-50 hover:bg-orange-100 px-4 py-2 rounded-lg transition-all duration-200 hover:-translate-x-1 self-start"
                 >
-                  Save
+                  <ArrowLeft className="w-5 h-5" />
+                  <span>Back to recipes</span>
+                </button>
+
+                {/* Save Button */}
+                <button
+                  onClick={handleSaveRecipe}
+                  className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
+                    isSaved 
+                      ? 'bg-gradient-to-r from-green-400 to-green-500 text-white' 
+                      : 'bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white shadow-lg hover:shadow-xl'
+                  }`}
+                >
+                  {isSaved ? '✓ Saved!' : 'Save Recipe'}
                 </button>
               </div>
-              
-              <p className="text-warmGray">
-                {selectedRecipe.description}
-              </p>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2">
-                {selectedRecipe.dietary?.map((diet) => (
-                  <span
-                    key={diet}
-                    className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full"
-                  >
-                    {diet}
+              {/* Recipe Title & Description */}
+              <div className="space-y-4">
+                <h1 className="text-3xl sm:text-4xl font-bold text-orange-600">
+                  {selectedRecipe.title}
+                </h1>
+                
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  {selectedRecipe.description}
+                </p>
+
+                {/* Meta Tags */}
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-4 py-2 bg-orange-100 text-orange-700 font-medium rounded-full border border-orange-200">
+                    ⏱️ {selectedRecipe.cookTime}
                   </span>
-                ))}
-                <span className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full">
-                  {selectedRecipe.cookTime}
-                </span>
-                <span className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full">
-                  {selectedRecipe.difficulty}
-                </span>
+                  <span className={`px-4 py-2 font-medium rounded-full ${
+                    selectedRecipe.difficulty === 'Easy' ? 'bg-green-100 text-green-700 border border-green-200' :
+                    selectedRecipe.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                    'bg-red-100 text-red-700 border border-red-200'
+                  }`}>
+                    {selectedRecipe.difficulty}
+                  </span>
+                  {selectedRecipe.dietary?.map((diet) => (
+                    <span
+                      key={diet}
+                      className="px-4 py-2 bg-orange-50 text-orange-600 font-medium rounded-full border border-orange-200"
+                    >
+                      {diet}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Recipe image placeholder */}
-            <div className="w-full h-48 bg-orange-50 rounded-lg flex items-center justify-center border-2 border-dashed border-orange-300">
-              <p className="text-primary font-medium">Recipe image placeholder</p>
+            {/* Recipe Image Placeholder */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="w-full h-64 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center border-2 border-dashed border-orange-300">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🍽️</div>
+                  <p className="text-orange-500 font-medium">Recipe image placeholder</p>
+                </div>
+              </div>
             </div>
 
-            {/* Ingredients and Steps */}
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Ingredients */}
-              <div>
-                <h2 className="text-xl font-semibold text-primary mb-4">Ingredients</h2>
-                <ul className="space-y-2">
+            {/* Ingredients and Steps Grid */}
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Ingredients Section */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span className="text-2xl mr-2">🥘</span>
+                  Ingredients
+                </h2>
+                <div className="space-y-3">
                   {selectedRecipe.ingredients.map((ingredient, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-orange-400 mr-2">•</span>
-                      <span className="text-warmGray">{ingredient}</span>
-                    </li>
+                    <div
+                      key={index}
+                      className="group flex items-center bg-orange-50 border-l-4 border-orange-400 p-4 rounded-lg hover:translate-x-2 transition-all duration-200 cursor-pointer"
+                      onClick={() => handleIngredientCheck(index)}
+                    >
+                      {/* Custom Checkbox */}
+                      <div className={`relative w-5 h-5 mr-4 border-2 rounded transition-all duration-200 ${
+                        checkedIngredients[index] 
+                          ? 'bg-orange-500 border-orange-500' 
+                          : 'border-orange-400 hover:border-orange-500'
+                      } ${isAnimating ? 'animate-pulse' : ''}`}>
+                        {checkedIngredients[index] && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <span className={`text-gray-700 ${checkedIngredients[index] ? 'line-through text-gray-400' : ''}`}>
+                        {ingredient}
+                      </span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {/* Steps */}
-              <div>
-                <h2 className="text-xl font-semibold text-primary mb-4">Steps</h2>
-                <ol className="space-y-3">
+              {/* Steps Section */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span className="text-2xl mr-2">👩‍🍳</span>
+                  Steps
+                </h2>
+                <div className="space-y-4">
                   {selectedRecipe.instructions.map((instruction, index) => (
-                    <li key={index} className="flex">
-                      <span className="bg-orange-200 text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-3 mt-0.5 flex-shrink-0">
+                    <div key={index} className="flex">
+                      {/* Step Number */}
+                      <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-1 flex-shrink-0 shadow-lg">
                         {index + 1}
-                      </span>
-                      <span className="text-warmGray">{instruction}</span>
-                    </li>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800 mb-1">Step {index + 1}</h3>
+                        <p className="text-gray-600 leading-relaxed">{instruction}</p>
+                      </div>
+                    </div>
                   ))}
-                </ol>
+                </div>
               </div>
             </div>
 
-            {/* Tip section */}
-            <div className="bg-yellow-25 border border-yellow-100 rounded-lg p-4" style={{ backgroundColor: '#fefce8' }}>
-              <div className="flex items-start space-x-2">
-                <Lightbulb className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                <p className="text-yellow-800">
-                  <span className="font-medium">Tip:</span> No cheddar? Use feta or mozzarella.
+            {/* Tip Section */}
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 relative">
+              {/* Lightbulb positioned at top border */}
+              <div className="absolute -top-3 left-6 bg-orange-100 p-2 rounded-full border border-orange-200">
+                <Lightbulb className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="pt-2">
+                <h3 className="font-bold text-orange-700 mb-2">Chef's Tip</h3>
+                <p className="text-gray-700">
+                  No cheddar? Try feta or mozzarella for a delicious variation. Feel free to adjust spices to your taste!
                 </p>
               </div>
             </div>

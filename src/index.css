@@ -262,6 +262,52 @@ body {
   animation: cookingBounce 2s ease-in-out infinite;
 }
 
+/* Custom animations for recipe detail interactions */
+.animate-slide-right {
+  animation: slideRight 0.2s ease-out;
+}
+
+.animate-checkbox-check {
+  animation: checkboxCheck 0.3s ease-out;
+}
+
+.animate-save-success {
+  animation: saveSuccess 0.5s ease-out;
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes checkboxCheck {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes saveSuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .bg-gradient-conic {
   background: conic-gradient(from 0deg, #fb923c, #ef4444, #fb923c);
 }
