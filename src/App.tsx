@@ -4,7 +4,8 @@
  */
 
 import { useState } from 'react';
-import { ChefHat, BookOpen, Loader2, ArrowLeft, Lightbulb } from 'lucide-react';
+import { ChefHat, Loader2, ArrowLeft, Lightbulb } from 'lucide-react';
+import { Header } from './components/Header';
 import { UploadBox } from './components/UploadBox';
 import { DietaryPrefs } from './components/DietaryPrefs';
 import { CuisinePrefs, type CuisinePreferences } from './components/CuisinePrefs';
@@ -111,7 +112,7 @@ function App() {
     switch (currentState) {
       case 'landing':
         return (
-          <div className="min-h-screen bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center px-4">
+          <div className="min-h-screen bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center px-4 pt-5">
             <div className="w-full max-w-lg">
               {/* Hero Section */}
               <div className="text-center mb-12">
@@ -439,38 +440,22 @@ function App() {
       {currentState === 'landing' ? (
         // Full-screen landing page
         <div className="min-h-screen">
+          <Header 
+            onLogoClick={handleStartOver}
+            onMyRecipesClick={() => setIsDrawerOpen(true)}
+            isMyRecipesActive={isDrawerOpen}
+          />
           {renderContent()}
         </div>
       ) : (
         // App layout for other pages
         <div className="min-h-screen bg-warm-gradient flex flex-col">
-          {/* Header - hide on recipe detail page */}
-          {currentState !== 'recipe-detail' && (
-            <header className="glassmorphism shadow-warm border-b border-warm-200">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                  {/* Logo */}
-                  <button 
-                    onClick={handleStartOver}
-                    className="flex items-center space-x-2 text-xl font-bold text-primary hover:text-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
-                  >
-                    <ChefHat className="w-8 h-8 text-primary" />
-                    <span>FridgeChef</span>
-                  </button>
-
-                  {/* Navigation */}
-                  <button
-                    onClick={() => setIsDrawerOpen(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                    aria-label="Open saved recipes"
-                  >
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    <span className="font-medium text-primary">My Recipes</span>
-                  </button>
-                </div>
-              </div>
-            </header>
-          )}
+          {/* Header for all pages */}
+          <Header 
+            onLogoClick={handleStartOver}
+            onMyRecipesClick={() => setIsDrawerOpen(true)}
+            isMyRecipesActive={isDrawerOpen}
+          />
 
           {/* Main content */}
           <main className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${currentState === 'recipe-detail' ? 'pt-8' : ''}`}>
