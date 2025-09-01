@@ -66,10 +66,10 @@ export function DietaryPrefs({ preferences, onChange }: DietaryPrefsProps) {
             onClick={() => option.key === 'none' ? handleNoneClick() : handleToggle(option.key as keyof DietaryPreferences)}
             className={`
               px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
               ${isSelected 
-                ? 'bg-green-100 text-green-800 border border-green-200' 
-                : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+                ? 'bg-orange-100 text-primary border border-orange-200' 
+                : 'bg-white text-warmGray border border-orange-200 hover:border-orange-300'
               }
             `}
             type="button"

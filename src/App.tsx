@@ -114,17 +114,17 @@ function App() {
           <div className="max-w-md mx-auto text-center space-y-8">
             {/* Header */}
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold text-green-600">
+              <h1 className="text-4xl font-semibold text-primary">
                 FridgeChef
               </h1>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-warmGray">
                 Turn your fridge into inspiration 🔍
               </p>
             </div>
 
             {/* Dietary Preferences */}
             <div className="space-y-4">
-              <p className="text-sm font-medium text-gray-700">Dietary Preference:</p>
+              <p className="text-sm font-medium text-warmGray">Dietary Preference:</p>
               <DietaryPrefs 
                 preferences={dietaryPreferences}
                 onChange={setDietaryPreferences}
@@ -141,12 +141,12 @@ function App() {
                 setDetectedIngredients(['eggs', 'spinach', 'cheese', 'milk', 'bread']);
                 setCurrentState('cuisine-preferences');
               }}
-              className="w-full bg-gray-200 text-gray-600 py-3 px-6 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+              className="w-full bg-orange-100 text-primary py-3 px-6 rounded-lg font-medium hover:bg-orange-200 transition-colors"
             >
               Generate Recipes
             </button>
             
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-warmGray">
               No recipes yet. Upload a fridge photo and click generate to get started.
             </p>
             
@@ -167,10 +167,10 @@ function App() {
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-primary mb-2">
                 Analyzing Your Fridge
               </h2>
-              <p className="text-gray-600">
+              <p className="text-warmGray">
                 Our AI is identifying ingredients from your photo...
               </p>
             </div>
@@ -181,17 +181,17 @@ function App() {
         return (
           <div className="max-w-4xl mx-auto space-y-8">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              <h2 className="text-3xl font-bold text-primary mb-4">
                 Great! We found these ingredients:
               </h2>
               
               {/* Detected ingredients */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-8">
                 <div className="flex flex-wrap gap-2 justify-center">
                   {detectedIngredients.map((ingredient, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-white border border-green-300 rounded-full text-sm font-medium text-gray-700"
+                      className="px-3 py-1 bg-white border border-orange-300 rounded-full text-sm font-medium text-primary"
                     >
                       {ingredient}
                     </span>
@@ -208,7 +208,7 @@ function App() {
             <div className="flex justify-center space-x-4">
               <button
                 onClick={handleStartOver}
-                className="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="px-6 py-3 border border-orange-300 rounded-lg font-medium text-primary hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Start Over
               </button>
@@ -231,10 +231,10 @@ function App() {
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-primary mb-2">
                 Cooking Up Recipes
               </h2>
-              <p className="text-gray-600">
+              <p className="text-warmGray">
                 Our AI chef is creating personalized recipes for you...
               </p>
             </div>
@@ -245,7 +245,7 @@ function App() {
         return (
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              <h2 className="text-3xl font-bold text-primary mb-4">
                 Here are your personalized recipes!
               </h2>
               <p className="text-gray-600 mb-6">
@@ -293,7 +293,7 @@ function App() {
             {/* Back button */}
             <button
               onClick={handleBackFromRecipe}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="flex items-center space-x-2 text-warmGray hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Back to recipes</span>
@@ -302,17 +302,17 @@ function App() {
             {/* Recipe header */}
             <div className="space-y-4">
               <div className="flex justify-between items-start">
-                <h1 className="text-3xl font-semibold text-gray-800">
+                <h1 className="text-3xl font-semibold text-primary">
                   {selectedRecipe.title}
                 </h1>
                 <button
-                  className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="p-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors"
                 >
                   Save
                 </button>
               </div>
               
-              <p className="text-gray-600">
+              <p className="text-warmGray">
                 {selectedRecipe.description}
               </p>
 
@@ -321,35 +321,35 @@ function App() {
                 {selectedRecipe.dietary?.map((diet) => (
                   <span
                     key={diet}
-                    className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full"
+                    className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full"
                   >
                     {diet}
                   </span>
                 ))}
-                <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full">
                   {selectedRecipe.cookTime}
                 </span>
-                <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full">
                   {selectedRecipe.difficulty}
                 </span>
               </div>
             </div>
 
             {/* Recipe image placeholder */}
-            <div className="w-full h-48 bg-green-50 rounded-lg flex items-center justify-center border-2 border-dashed border-green-300">
-              <p className="text-green-600 font-medium">Recipe image placeholder</p>
+            <div className="w-full h-48 bg-orange-50 rounded-lg flex items-center justify-center border-2 border-dashed border-orange-300">
+              <p className="text-primary font-medium">Recipe image placeholder</p>
             </div>
 
             {/* Ingredients and Steps */}
             <div className="grid md:grid-cols-2 gap-8">
               {/* Ingredients */}
               <div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Ingredients</h2>
+                <h2 className="text-xl font-semibold text-primary mb-4">Ingredients</h2>
                 <ul className="space-y-2">
                   {selectedRecipe.ingredients.map((ingredient, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="text-gray-400 mr-2">•</span>
-                      <span className="text-gray-700">{ingredient}</span>
+                      <span className="text-orange-400 mr-2">•</span>
+                      <span className="text-warmGray">{ingredient}</span>
                     </li>
                   ))}
                 </ul>
@@ -357,14 +357,14 @@ function App() {
 
               {/* Steps */}
               <div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Steps</h2>
+                <h2 className="text-xl font-semibold text-primary mb-4">Steps</h2>
                 <ol className="space-y-3">
                   {selectedRecipe.instructions.map((instruction, index) => (
                     <li key={index} className="flex">
-                      <span className="bg-gray-200 text-gray-700 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-3 mt-0.5 flex-shrink-0">
+                      <span className="bg-orange-200 text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-3 mt-0.5 flex-shrink-0">
                         {index + 1}
                       </span>
-                      <span className="text-gray-700">{instruction}</span>
+                      <span className="text-warmGray">{instruction}</span>
                     </li>
                   ))}
                 </ol>
@@ -389,16 +389,16 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header - hide on recipe detail page */}
       {currentState !== 'recipe-detail' && (
-        <header className="bg-white shadow-sm border-b border-gray-200">
+        <header className="bg-white shadow-sm border-b border-orange-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* Logo */}
               <button 
                 onClick={handleStartOver}
-                className="flex items-center space-x-2 text-xl font-bold text-gray-800 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+                className="flex items-center space-x-2 text-xl font-bold text-primary hover:text-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
               >
                 <ChefHat className="w-8 h-8 text-primary" />
                 <span>FridgeChef</span>
@@ -407,11 +407,11 @@ function App() {
               {/* Navigation */}
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="flex items-center space-x-2 px-4 py-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 aria-label="Open saved recipes"
               >
-                <BookOpen className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-700">My Recipes</span>
+                <BookOpen className="w-5 h-5 text-primary" />
+                <span className="font-medium text-primary">My Recipes</span>
               </button>
             </div>
           </div>
@@ -432,9 +432,9 @@ function App() {
 
       {/* Footer - hide on recipe detail page */}
       {currentState !== 'recipe-detail' && (
-        <footer className="bg-white border-t border-gray-200 mt-auto">
+        <footer className="bg-white border-t border-orange-200 mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center text-gray-600">
+            <div className="text-center text-warmGray">
               <p className="mb-2">
                 Made with ❤️ for better cooking experiences
               </p>

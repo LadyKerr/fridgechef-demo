@@ -34,9 +34,9 @@ export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedReci
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy': return 'text-green-600 bg-green-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'medium': return 'text-orange-600 bg-orange-100';
       case 'hard': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      default: return 'text-primary bg-orange-100';
     }
   };
 
@@ -91,16 +91,16 @@ export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedReci
         aria-labelledby="drawer-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 id="drawer-title" className="text-xl font-semibold text-gray-800">
+        <div className="flex items-center justify-between p-6 border-b border-orange-200">
+          <h2 id="drawer-title" className="text-xl font-semibold text-primary">
             My Saved Recipes
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="p-2 rounded-full hover:bg-orange-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             aria-label="Close saved recipes"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-warmGray" />
           </button>
         </div>
 
@@ -108,11 +108,11 @@ export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedReci
         <div className="flex-1 overflow-y-auto p-6">
           {savedRecipes.length === 0 ? (
             <div className="text-center py-12">
-              <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-600 mb-2">
+              <Heart className="w-16 h-16 text-orange-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-warmGray mb-2">
                 No saved recipes yet
               </h3>
-              <p className="text-gray-500">
+              <p className="text-warmGray">
                 Save recipes by clicking the heart icon on any recipe card
               </p>
             </div>
@@ -143,20 +143,20 @@ export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedReci
                   </div>
 
                   {/* Recipe description */}
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                  <p className="text-sm text-warmGray mb-3 line-clamp-2">
                     {recipe.description}
                   </p>
 
                   {/* Recipe meta */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-1 text-gray-500">
+                      <div className="flex items-center space-x-1 text-warmGray">
                         <Clock className="w-3 h-3" />
                         <span className="text-xs font-medium">{recipe.cookTime}</span>
                       </div>
                       
                       <div className="flex items-center space-x-1">
-                        <ChefHat className="w-3 h-3 text-gray-500" />
+                        <ChefHat className="w-3 h-3 text-warmGray" />
                         <span className={`
                           text-xs font-medium px-2 py-0.5 rounded-full
                           ${getDifficultyColor(recipe.difficulty)}
@@ -172,13 +172,13 @@ export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedReci
                         {recipe.dietary.slice(0, 2).map((diet) => (
                           <span
                             key={diet}
-                            className="px-1.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                            className="px-1.5 py-0.5 text-xs font-medium bg-orange-100 text-primary rounded-full"
                           >
                             {diet}
                           </span>
                         ))}
                         {recipe.dietary.length > 2 && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-warmGray">
                             +{recipe.dietary.length - 2}
                           </span>
                         )}
@@ -188,7 +188,7 @@ export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedReci
 
                   {/* Quick ingredient count */}
                   <div className="mt-2 flex justify-between items-center">
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-warmGray">
                       {recipe.ingredients.length} ingredients • {recipe.instructions.length} steps
                     </div>
                     <div className="text-xs text-primary font-medium">
@@ -203,8 +203,8 @@ export function SavedRecipesDrawer({ isOpen, onClose, onRecipeClick }: SavedReci
 
         {/* Footer */}
         {savedRecipes.length > 0 && (
-          <div className="p-6 border-t border-gray-200 bg-gray-50">
-            <p className="text-sm text-gray-600 text-center">
+          <div className="p-6 border-t border-orange-200 bg-orange-50">
+            <p className="text-sm text-warmGray text-center">
               {savedRecipes.length} recipe{savedRecipes.length === 1 ? '' : 's'} saved
             </p>
           </div>

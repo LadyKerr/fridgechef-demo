@@ -43,9 +43,9 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy': return 'text-green-600 bg-green-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'medium': return 'text-orange-600 bg-orange-100';
       case 'hard': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      default: return 'text-primary bg-orange-100';
     }
   };
 
@@ -57,7 +57,7 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
         {recipe.dietary.map((diet) => (
           <span
             key={diet}
-            className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+            className="px-2 py-1 text-xs font-medium bg-orange-100 text-primary rounded-full"
           >
             {diet}
           </span>
@@ -70,7 +70,7 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
     <div className="card group hover:shadow-lg transition-shadow duration-200">
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
-        <h3 className="text-xl font-semibold text-gray-800 group-hover:text-primary transition-colors">
+        <h3 className="text-xl font-semibold text-primary group-hover:text-secondary transition-colors">
           {recipe.title}
         </h3>
         
@@ -81,7 +81,7 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
             ${isSaved 
               ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-              : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-red-500'
+              : 'bg-orange-100 text-orange-400 hover:bg-orange-200 hover:text-red-500'
             }
           `}
           aria-label={isSaved ? 'Remove from favorites' : 'Add to favorites'}
@@ -94,20 +94,20 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
       </div>
 
       {/* Description */}
-      <p className="text-gray-600 mb-4 leading-relaxed line-clamp-2">
+      <p className="text-warmGray mb-4 leading-relaxed line-clamp-2">
         {recipe.description}
       </p>
 
       {/* Meta information */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-1 text-gray-500">
+          <div className="flex items-center space-x-1 text-warmGray">
             <Clock className="w-4 h-4" />
             <span className="text-sm font-medium">{recipe.cookTime}</span>
           </div>
           
           <div className="flex items-center space-x-1">
-            <ChefHat className="w-4 h-4 text-gray-500" />
+            <ChefHat className="w-4 h-4 text-warmGray" />
             <span className={`
               text-sm font-medium px-2 py-1 rounded-full
               ${getDifficultyColor(recipe.difficulty)}
@@ -122,8 +122,8 @@ export function RecipeCard({ recipe, onSaveToggle }: RecipeCardProps) {
       {getDietaryBadges()}
 
       {/* Click hint */}
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <p className="text-sm text-gray-500 group-hover:text-primary transition-colors">
+      <div className="mt-4 pt-4 border-t border-orange-100">
+        <p className="text-sm text-warmGray group-hover:text-primary transition-colors">
           Click to view full recipe →
         </p>
       </div>

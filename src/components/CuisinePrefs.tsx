@@ -60,10 +60,10 @@ export function CuisinePrefs({ preferences, onChange }: CuisinePrefsProps) {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-4">
       <div className="text-center space-y-2">
-        <h3 className="text-lg font-semibold text-gray-800">
+        <h3 className="text-lg font-semibold text-primary">
           Cuisine Preference (Optional)
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-warmGray">
           Choose a cuisine style for your recipes
         </p>
       </div>
@@ -78,10 +78,10 @@ export function CuisinePrefs({ preferences, onChange }: CuisinePrefsProps) {
               onClick={() => handleCuisineSelect(cuisine)}
               className={`
                 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
                 ${isSelected 
-                  ? 'bg-blue-100 text-blue-800 border border-blue-200' 
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+                  ? 'bg-orange-100 text-primary border border-orange-200' 
+                  : 'bg-white text-warmGray border border-orange-200 hover:border-orange-300'
                 }
               `}
               type="button"
@@ -95,10 +95,10 @@ export function CuisinePrefs({ preferences, onChange }: CuisinePrefsProps) {
           onClick={() => handleCuisineSelect('Other')}
           className={`
             px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
             ${preferences.selectedCuisine === 'Other'
-              ? 'bg-blue-100 text-blue-800 border border-blue-200' 
-              : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+              ? 'bg-orange-100 text-primary border border-orange-200' 
+              : 'bg-white text-warmGray border border-orange-200 hover:border-orange-300'
             }
           `}
           type="button"
@@ -115,7 +115,7 @@ export function CuisinePrefs({ preferences, onChange }: CuisinePrefsProps) {
             placeholder="Enter cuisine type..."
             value={preferences.customCuisine}
             onChange={(e) => handleCustomCuisineChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             autoFocus
           />
         </div>

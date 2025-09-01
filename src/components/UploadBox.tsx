@@ -74,8 +74,8 @@ export function UploadBox({ onImageUpload, isLoading = false }: UploadBoxProps) 
         relative w-full max-w-sm mx-auto p-8 border-2 border-dashed rounded-xl
         transition-all duration-200 cursor-pointer
         ${isDragOver 
-          ? 'border-green-400 bg-green-50' 
-          : 'border-green-300 hover:border-green-400 hover:bg-green-50/50'
+          ? 'border-orange-400 bg-orange-50' 
+          : 'border-orange-300 hover:border-orange-400 hover:bg-orange-50/50'
         }
         ${isLoading ? 'pointer-events-none opacity-60' : ''}
       `}
@@ -107,19 +107,19 @@ export function UploadBox({ onImageUpload, isLoading = false }: UploadBoxProps) 
       <div className="text-center space-y-4">
         {isLoading ? (
           <>
-            <Loader2 className="w-8 h-8 mx-auto text-green-600 animate-spin" />
+            <Loader2 className="w-8 h-8 mx-auto text-primary animate-spin" />
             <div>
-              <p className="text-sm font-medium text-gray-700">Analyzing your fridge...</p>
+              <p className="text-sm font-medium text-warmGray">Analyzing your fridge...</p>
             </div>
           </>
         ) : (
           <>
             <div className="flex justify-center">
-              <Upload className="w-8 h-8 text-green-600" />
+              <Upload className="w-8 h-8 text-primary" />
             </div>
             
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">
+              <p className="text-sm font-medium text-warmGray mb-1">
                 Upload fridge photo
               </p>
             </div>

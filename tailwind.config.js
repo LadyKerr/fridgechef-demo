@@ -7,9 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#4CAF50', // Fresh green
-        secondary: '#FF9800', // Warm orange
-        background: '#FAFAFA', // Light background
+        primary: '#D2691E', // Chocolate/terracotta
+        secondary: '#FF6B47', // Coral red
+        accent: '#FFB347', // Peach/golden yellow
+        background: '#FFF8F0', // Warm cream
+        warmGray: '#8B7355', // Warm brown-gray
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

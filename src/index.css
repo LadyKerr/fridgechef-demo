@@ -10,8 +10,8 @@ body, html {
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
-  background-color: #FAFAFA;
-  color: #333;
+  background-color: #FFF8F0;
+  color: #4A3728;
   line-height: 1.6;
 }
 
@@ -27,7 +27,7 @@ body, html {
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #D2691E;
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -42,16 +42,16 @@ body, html {
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
+  background-color: #B8541A;
 }
 
 .btn-primary:focus {
-  outline: 2px solid #4CAF50;
+  outline: 2px solid #D2691E;
   outline-offset: 2px;
 }
 
 .btn-secondary {
-  background-color: #FF9800;
+  background-color: #FF6B47;
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -66,25 +66,25 @@ body, html {
 }
 
 .btn-secondary:hover {
-  background-color: #e68900;
+  background-color: #E55A3C;
 }
 
 .btn-secondary:focus {
-  outline: 2px solid #FF9800;
+  outline: 2px solid #FF6B47;
   outline-offset: 2px;
 }
 
 .card {
   background: white;
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 3px rgba(210, 105, 30, 0.1);
+  border: 1px solid #F5E6D3;
   padding: 1.5rem;
   transition: box-shadow 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(210, 105, 30, 0.15);
 }
 
 /* Layout utilities */
