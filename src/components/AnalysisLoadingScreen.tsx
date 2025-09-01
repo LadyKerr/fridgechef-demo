@@ -20,6 +20,20 @@ interface AnalysisLoadingScreenProps {
 export function AnalysisLoadingScreen({ onComplete, mode = 'analysis' }: AnalysisLoadingScreenProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(0);
+  const [progress, setProgress] = useState(10);
+
+  // Dynamic subtitles for recipe generation
+  const subtitles = [
+    "Mixing the perfect ingredients...",
+    "Seasoning with AI magic...",
+    "Checking flavor combinations...",
+    "Adding finishing touches...",
+    "Plating your recipes..."
+  ];
+
+  // Floating recipe emojis
+  const recipeEmojis = ['🍝', '🥗', '🍲', '🥘', '🍛', '🥙', '🌮', '🍜', '🥧'];
 
   const steps: AnalysisStep[] = mode === 'analysis' ? [
     { id: 'upload', label: 'Photo uploaded successfully', status: 'completed' },
@@ -36,42 +50,149 @@ export function AnalysisLoadingScreen({ onComplete, mode = 'analysis' }: Analysi
   const [analysisSteps, setAnalysisSteps] = useState(steps);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAnalysisSteps(prev => {
-        const newSteps = [...prev];
-        
-        if (currentStepIndex < newSteps.length) {
-          // Complete current active step
-          if (currentStepIndex > 0) {
-            newSteps[currentStepIndex - 1].status = 'completed';
-          }
-          
-          // Set current step as active
-          if (currentStepIndex < newSteps.length) {
-            newSteps[currentStepIndex].status = 'active';
-          }
-        }
-        
-        return newSteps;
-      });
+    if (mode === 'generating') {
+      // Handle subtitle cycling for recipe generation
+      const subtitleInterval = setInterval(() => {
+        setCurrentSubtitleIndex(prev => (prev + 1) % subtitles.length);
+      }, 2000);
 
-      if (currentStepIndex < steps.length) {
-        setCurrentStepIndex(prev => prev + 1);
-      } else if (!isComplete) {
-        // All steps completed
-        setAnalysisSteps(prev => prev.map(step => ({ ...step, status: 'completed' as const })));
+      // Handle progress bar animation
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          const newProgress = prev + 5;
+          return newProgress > 95 ? 10 : newProgress; // Reset cycle
+        });
+      }, 200);
+
+      // Complete after 8 seconds for recipe generation
+      const completionTimer = setTimeout(() => {
         setIsComplete(true);
-        
-        // Redirect after completion
         setTimeout(() => {
           onComplete?.();
-        }, 1500);
-      }
-    }, 2000);
+        }, 2000);
+      }, 8000);
 
-    return () => clearInterval(interval);
-  }, [currentStepIndex, isComplete, onComplete, steps.length]);
+      return () => {
+        clearInterval(subtitleInterval);
+        clearInterval(progressInterval);
+        clearTimeout(completionTimer);
+      };
+    } else {
+      // Original analysis mode logic
+      const interval = setInterval(() => {
+        setAnalysisSteps(prev => {
+          const newSteps = [...prev];
+          
+          if (currentStepIndex < newSteps.length) {
+            // Complete current active step
+            if (currentStepIndex > 0) {
+              newSteps[currentStepIndex - 1].status = 'completed';
+            }
+            
+            // Set current step as active
+            if (currentStepIndex < newSteps.length) {
+              newSteps[currentStepIndex].status = 'active';
+            }
+          }
+          
+          return newSteps;
+        });
 
+        if (currentStepIndex < steps.length) {
+          setCurrentStepIndex(prev => prev + 1);
+        } else if (!isComplete) {
+          // All steps completed
+          setAnalysisSteps(prev => prev.map(step => ({ ...step, status: 'completed' as const })));
+          setIsComplete(true);
+          
+          // Redirect after completion
+          setTimeout(() => {
+            onComplete?.();
+          }, 1500);
+        }
+      }, 2000);
+
+      return () => clearInterval(interval);
+    }
+  }, [currentStepIndex, isComplete, onComplete, steps.length, mode, subtitles.length]);
+
+  // Render recipe generation loading screen
+  if (mode === 'generating') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-500 to-red-400 flex items-center justify-center px-4 relative overflow-hidden">
+        {/* Floating Recipe Emojis */}
+        {recipeEmojis.map((emoji, index) => (
+          <div
+            key={index}
+            className="absolute text-4xl opacity-20 animate-recipe-float"
+            style={{
+              left: `${10 + (index * 10)}%`,
+              animationDelay: `${-index * 1}s`,
+              animationDuration: '8s'
+            }}
+          >
+            {emoji}
+          </div>
+        ))}
+
+        <div className="w-full max-w-md relative z-10">
+          {/* Main heading with glow animation */}
+          <div className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 animate-text-glow">
+              {isComplete ? 'Bon Appétit!' : 'Cooking Up Recipes'}
+            </h1>
+            <p className="text-xl text-white/90 transition-all duration-500">
+              {isComplete 
+                ? 'Your personalized recipes are ready!' 
+                : subtitles[currentSubtitleIndex]
+              }
+            </p>
+          </div>
+
+          {/* Central Chef Animation */}
+          <div className="flex justify-center mb-12">
+            <div className="relative animate-float">
+              {/* Rotating gradient border */}
+              <div className="w-32 h-32 rounded-full animate-spin-slow p-1"
+                   style={{ background: 'conic-gradient(from 0deg, #fb923c, #ef4444, #f97316, #fb923c)' }}>
+                {/* Inner glassmorphism container */}
+                <div className="w-full h-full rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-2xl">
+                  {/* Chef icon with cooking animation */}
+                  <div className="relative">
+                    <div className={`text-5xl ${isComplete ? 'animate-celebration-bounce' : 'animate-bounce-cooking'}`}>
+                      {isComplete ? '🎉' : '👨‍🍳'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar with Shine Effect */}
+          <div className="mb-8">
+            <div className="w-full h-3 bg-white/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-orange-400 to-red-400 rounded-full relative transition-all duration-200 ease-out"
+                style={{ width: `${progress}%` }}
+              >
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom text */}
+          <div className="text-center">
+            <p className="text-white/80 text-sm">
+              Made with ❤️ for better cooking experiences
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Original analysis mode
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-500 to-red-400 flex items-center justify-center px-4 relative overflow-hidden">
       {/* Background decorative elements */}

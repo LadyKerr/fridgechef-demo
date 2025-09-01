@@ -159,6 +159,23 @@ body {
   75% { transform: scale(1.05) rotate(2deg); }
 }
 
+@keyframes recipeFloat {
+  0% { 
+    transform: translateY(100vh) rotate(0deg); 
+    opacity: 0; 
+  }
+  10% { 
+    opacity: 0.3; 
+  }
+  90% { 
+    opacity: 0.3; 
+  }
+  100% { 
+    transform: translateY(-20vh) rotate(360deg); 
+    opacity: 0; 
+  }
+}
+
 @keyframes celebrationBounce {
   0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
   40% { transform: translateY(-10px) scale(1.1); }
@@ -219,6 +236,14 @@ body {
 
 .animate-celebration-bounce {
   animation: celebrationBounce 2s ease-in-out infinite;
+}
+
+.animate-recipe-float {
+  animation: recipeFloat 8s linear infinite;
+}
+
+.animate-bounce-cooking {
+  animation: cookingBounce 2s ease-in-out infinite;
 }
 
 .bg-gradient-conic {
