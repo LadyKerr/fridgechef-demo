@@ -3,7 +3,7 @@
  * Allows users to select their preferred cuisine type
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export interface CuisinePreferences {
   selectedCuisine: string;

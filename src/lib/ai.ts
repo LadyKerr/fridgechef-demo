@@ -208,8 +208,8 @@ export async function detectIngredientsFromImage(imageFile: File): Promise<strin
     // Parse the comma-separated ingredients
     const ingredients = ingredientsText
       .split(',')
-      .map(ingredient => ingredient.trim())
-      .filter(ingredient => ingredient.length > 0 && ingredient.length < 50) // Filter out very long strings
+      .map((ingredient: string) => ingredient.trim())
+      .filter((ingredient: string) => ingredient.length > 0 && ingredient.length < 50) // Filter out very long strings
       .slice(0, 20); // Limit to 20 ingredients max
     
     if (ingredients.length === 0) {

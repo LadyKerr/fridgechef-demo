@@ -3,14 +3,14 @@
  * A smart recipe generator that analyzes your fridge contents
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChefHat, BookOpen, Loader2, ArrowLeft, Lightbulb } from 'lucide-react';
 import { UploadBox } from './components/UploadBox';
 import { DietaryPrefs } from './components/DietaryPrefs';
-import { CuisinePrefs, CuisinePreferences } from './components/CuisinePrefs';
+import { CuisinePrefs, type CuisinePreferences } from './components/CuisinePrefs';
 import { RecipeCard } from './components/RecipeCard';
 import { SavedRecipesDrawer } from './components/SavedRecipesDrawer';
-import { detectIngredientsFromImage, generateRecipes, Recipe, DietaryPreferences } from './lib/ai';
+import { detectIngredientsFromImage, generateRecipes, type Recipe, type DietaryPreferences } from './lib/ai';
 
 // Application states
 type AppState = 'landing' | 'uploading' | 'cuisine-preferences' | 'generating' | 'results' | 'recipe-detail';

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Clock, ChefHat, Heart } from 'lucide-react';
-import { Recipe } from '../lib/ai';
+import { type Recipe } from '../lib/ai';
 import { saveRecipe, unsaveRecipe, isRecipeSaved } from '../lib/storage';
 
 interface RecipeCardProps {

@@ -3,7 +3,7 @@
  * Manages saved recipes and user preferences
  */
 
-import { Recipe } from './ai';
+import { type Recipe } from './ai';
 
 const STORAGE_KEY = 'fc:saved';
 

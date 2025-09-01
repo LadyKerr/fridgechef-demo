@@ -3,8 +3,7 @@
  * Allows users to select their dietary preferences/restrictions
  */
 
-import React from 'react';
-import { DietaryPreferences } from '../lib/ai';
+import { type DietaryPreferences } from '../lib/ai';
 
 interface DietaryPrefsProps {
   preferences: DietaryPreferences;
