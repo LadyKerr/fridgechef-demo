@@ -112,21 +112,44 @@ const MOCK_RECIPES: Recipe[] = [
  */
 export async function detectIngredientsFromImage(imageFile: File): Promise<string[]> {
   const isMockMode = import.meta.env.VITE_MOCK === 'true';
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  
+  console.log('Environment check:', {
+    isMockMode,
+    hasApiKey: !!apiKey,
+    apiKeyLength: apiKey?.length,
+    mockEnvValue: import.meta.env.VITE_MOCK
+  });
   
   if (isMockMode) {
+    console.log('Running in mock mode');
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     return MOCK_INGREDIENTS;
   }
 
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
   if (!apiKey) {
+    console.error('OpenAI API key not found. Environment variables:', {
+      VITE_MOCK: import.meta.env.VITE_MOCK,
+      VITE_OPENAI_API_KEY: import.meta.env.VITE_OPENAI_API_KEY ? '[PRESENT]' : '[MISSING]'
+    });
     throw new Error('OpenAI API key not found. Please set VITE_OPENAI_API_KEY in your .env file.');
+  }
+
+  // Validate file type and size
+  if (!imageFile.type.startsWith('image/')) {
+    throw new Error('Please upload a valid image file.');
+  }
+
+  if (imageFile.size > 20 * 1024 * 1024) { // 20MB limit
+    throw new Error('Image file is too large. Please upload an image smaller than 20MB.');
   }
 
   try {
     // Convert image to base64
     const base64Image = await convertImageToBase64(imageFile);
+    
+    console.log('Making OpenAI API call for image analysis...');
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -135,14 +158,14 @@ export async function detectIngredientsFromImage(imageFile: File): Promise<strin
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision-preview',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Analyze this fridge image and list all the visible food ingredients. Return only a comma-separated list of ingredients, nothing else.'
+                text: 'Analyze this fridge image and identify all visible food ingredients. Focus on ingredients that can be used for cooking. Return only a comma-separated list of ingredients, nothing else. Example: chicken breast, broccoli, carrots, eggs, milk'
               },
               {
                 type: 'image_url',
@@ -153,27 +176,39 @@ export async function detectIngredientsFromImage(imageFile: File): Promise<strin
             ]
           }
         ],
-        max_tokens: 300
+        max_tokens: 300,
+        temperature: 0.3
       })
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
     const ingredientsText = data.choices[0]?.message?.content || '';
     
+    if (!ingredientsText) {
+      throw new Error('No ingredients detected in the image');
+    }
+    
     // Parse the comma-separated ingredients
-    return ingredientsText
+    const ingredients = ingredientsText
       .split(',')
       .map(ingredient => ingredient.trim())
-      .filter(ingredient => ingredient.length > 0);
+      .filter(ingredient => ingredient.length > 0 && ingredient.length < 50) // Filter out very long strings
+      .slice(0, 20); // Limit to 20 ingredients max
+    
+    if (ingredients.length === 0) {
+      throw new Error('No valid ingredients detected in the image');
+    }
+    
+    return ingredients;
       
   } catch (error) {
     console.error('Error detecting ingredients:', error);
-    // Fallback to mock data on error
-    return MOCK_INGREDIENTS;
+    throw error instanceof Error ? error : new Error('Unknown error occurred while detecting ingredients');
   }
 }
 
@@ -213,6 +248,10 @@ export async function generateRecipes(
     throw new Error('OpenAI API key not found. Please set VITE_OPENAI_API_KEY in your .env file.');
   }
 
+  if (!ingredients || ingredients.length === 0) {
+    throw new Error('No ingredients provided for recipe generation');
+  }
+
   try {
     const dietaryText = Object.entries(preferences)
       .filter(([, enabled]) => enabled)
@@ -229,24 +268,34 @@ export async function generateRecipes(
       .join(', ');
 
     const prompt = `
-Create 3-5 recipes using these ingredients: ${ingredients.join(', ')}.
-${dietaryText ? `Dietary requirements: ${dietaryText}.` : ''}
+Create 3-5 delicious and practical recipes using primarily these ingredients: ${ingredients.join(', ')}.
 
-Return a JSON array of recipes with this exact structure:
+${dietaryText ? `IMPORTANT: All recipes must be ${dietaryText}.` : ''}
+
+Guidelines:
+- Each recipe should use at least 3 of the provided ingredients
+- Include realistic cook times (15-60 minutes)
+- Provide clear, step-by-step instructions
+- Include common pantry items if needed (salt, pepper, oil, etc.)
+- Make recipes practical for home cooking
+
+Return ONLY a valid JSON array with this exact structure:
 [
   {
-    "id": "unique_id",
+    "id": "recipe_1",
     "title": "Recipe Name",
-    "description": "Brief description",
-    "cookTime": "15-45 mins",
-    "difficulty": "easy|medium|hard",
-    "ingredients": ["ingredient 1", "ingredient 2"],
-    "instructions": ["step 1", "step 2"],
-    "dietary": ["vegetarian", "vegan", "gluten-free", "dairy-free"]
+    "description": "Brief appetizing description (1-2 sentences)",
+    "cookTime": "25 mins",
+    "difficulty": "easy",
+    "ingredients": ["2 chicken breasts", "1 cup broccoli", "2 tbsp olive oil"],
+    "instructions": ["Step 1", "Step 2", "Step 3"],
+    "dietary": ["vegetarian"]
   }
 ]
 
-Only return valid JSON, no other text.
+Difficulty levels: "easy", "medium", "hard"
+Cook time format: "X mins" or "X hours Y mins"
+Dietary tags: "vegetarian", "vegan", "gluten-free", "dairy-free"
     `;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -256,36 +305,61 @@ Only return valid JSON, no other text.
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         messages: [
+          {
+            role: 'system',
+            content: 'You are a professional chef and recipe creator. Generate practical, delicious recipes based on available ingredients. Always return valid JSON only.'
+          },
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_tokens: 2000,
+        max_tokens: 3000,
         temperature: 0.7
       })
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
     const recipesJson = data.choices[0]?.message?.content || '[]';
     
+    if (!recipesJson) {
+      throw new Error('No recipes generated');
+    }
+    
     try {
-      return JSON.parse(recipesJson);
+      const recipes = JSON.parse(recipesJson);
+      
+      // Validate the response structure
+      if (!Array.isArray(recipes)) {
+        throw new Error('Invalid response format');
+      }
+      
+      // Validate each recipe has required fields
+      const validRecipes = recipes.filter(recipe => 
+        recipe.id && recipe.title && recipe.ingredients && recipe.instructions
+      );
+      
+      if (validRecipes.length === 0) {
+        throw new Error('No valid recipes in response');
+      }
+      
+      return validRecipes;
     } catch (parseError) {
       console.error('Error parsing recipes JSON:', parseError);
-      return MOCK_RECIPES;
+      console.error('Raw response:', recipesJson);
+      throw new Error('Failed to parse recipe response');
     }
     
   } catch (error) {
     console.error('Error generating recipes:', error);
-    // Fallback to mock data on error
-    return MOCK_RECIPES;
+    throw error instanceof Error ? error : new Error('Unknown error occurred while generating recipes');
   }
 }
 

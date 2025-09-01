@@ -25,7 +25,7 @@ A smart recipe generator that analyzes your fridge contents and suggests persona
 - **Frontend**: React 18 + TypeScript + Vite
 - **Styling**: TailwindCSS with custom design system
 - **Icons**: Lucide React
-- **AI**: OpenAI GPT-4 Vision & GPT-3.5 Turbo
+- **AI**: OpenAI GPT-4o-mini (Vision & Chat)
 - **Storage**: Browser localStorage
 - **Deployment**: Ready for Vercel/Netlify
 
@@ -130,16 +130,11 @@ src/
 
 ## API Integration
 
-### OpenAI Vision API
-- Analyzes uploaded fridge images
-- Extracts ingredient lists
-- Fallback to mock data on errors
-
-### OpenAI Chat API
-- Generates personalized recipes
-- Respects dietary preferences
-- Returns structured JSON responses
-- Error handling with mock fallbacks
+### OpenAI GPT-4o-mini API
+- **Vision**: Analyzes uploaded fridge images and extracts ingredient lists
+- **Chat**: Generates personalized recipes based on ingredients and dietary preferences
+- **Error Handling**: Graceful fallback to mock data on API errors
+- **Validation**: Input validation and response parsing with proper error messages
 
 ## Styling Guide
 

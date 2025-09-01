@@ -98,15 +98,56 @@ function App() {
 
             <UploadBox onImageUpload={handleImageUpload} />
             
+            {/* Temporary debug button */}
+            {import.meta.env.VITE_MOCK === 'false' && (
+              <button 
+                onClick={async () => {
+                  try {
+                    console.log('Testing API...');
+                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+                      },
+                      body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [{ role: 'user', content: 'Test' }],
+                        max_tokens: 5
+                      })
+                    });
+                    console.log('API Response Status:', response.status);
+                    if (response.ok) {
+                      const data = await response.json();
+                      console.log('API Success:', data);
+                      alert('API test successful!');
+                    } else {
+                      const error = await response.json();
+                      console.error('API Error:', error);
+                      alert(`API Error: ${error.error?.message || 'Unknown error'}`);
+                    }
+                  } catch (err) {
+                    console.error('Network Error:', err);
+                    alert(`Network Error: ${err.message}`);
+                  }
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Test API Connection
+              </button>
+            )}
+            
             {error && (
               <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-800 text-sm">{error}</p>
               </div>
             )}
 
-            <p className="text-sm text-gray-500">
-              Currently in demo mode - using mock data for ingredient detection
-            </p>
+            {import.meta.env.VITE_MOCK === 'true' && (
+              <p className="text-sm text-gray-500">
+                Currently in demo mode - using mock data for ingredient detection
+              </p>
+            )}
           </div>
         );
 
@@ -283,9 +324,11 @@ function App() {
             <p className="mb-2">
               Made with ❤️ for better cooking experiences
             </p>
-            <p className="text-sm">
-              Demo mode active - Switch to production by adding your OpenAI API key
-            </p>
+            {import.meta.env.VITE_MOCK === 'true' && (
+              <p className="text-sm">
+                Demo mode active - Switch to production by adding your OpenAI API key
+              </p>
+            )}
           </div>
         </div>
       </footer>
