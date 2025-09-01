@@ -113,7 +113,7 @@ function App() {
     switch (currentState) {
       case 'landing':
         return (
-          <div className="min-h-screen bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center px-4 pt-5">
+          <div className="min-h-screen flex items-center justify-center px-4">
             <div className="w-full max-w-lg">
               {/* Hero Section */}
               <div className="text-center mb-12">
@@ -215,45 +215,109 @@ function App() {
 
       case 'cuisine-preferences':
         return (
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-primary mb-4">
-                Great! We found these ingredients:
-              </h2>
-              
-              {/* Detected ingredients */}
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-8">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {detectedIngredients.map((ingredient, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-white border border-orange-300 rounded-full text-sm font-medium text-primary"
-                    >
-                      {ingredient}
-                    </span>
-                  ))}
+          <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 pt-5">
+            <div className="w-full max-w-3xl">
+              {/* Success Header with animated icon */}
+              <div className="text-center mb-8">
+                <div className="text-6xl mb-4 animate-celebration-bounce">
+                  🎉
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4" 
+                    style={{ textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}>
+                  Great! We found these ingredients:
+                </h1>
+              </div>
+
+              {/* White card with ingredients */}
+              <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20 mb-8">
+                {/* Ingredients Display */}
+                <div className="mb-8">
+                  <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
+                    {detectedIngredients.map((ingredient, index) => {
+                      // Add emojis to common ingredients
+                      const getIngredientEmoji = (ing: string) => {
+                        const lowerIng = ing.toLowerCase();
+                        if (lowerIng.includes('apple')) return '🍎';
+                        if (lowerIng.includes('carrot')) return '🥕';
+                        if (lowerIng.includes('chicken') || lowerIng.includes('meat')) return '🍗';
+                        if (lowerIng.includes('cheese')) return '🧀';
+                        if (lowerIng.includes('egg')) return '🥚';
+                        if (lowerIng.includes('spinach') || lowerIng.includes('lettuce') || lowerIng.includes('salad')) return '🥬';
+                        if (lowerIng.includes('milk')) return '🥛';
+                        if (lowerIng.includes('bread')) return '🍞';
+                        if (lowerIng.includes('tomato')) return '🍅';
+                        if (lowerIng.includes('onion')) return '🧅';
+                        if (lowerIng.includes('garlic')) return '🧄';
+                        if (lowerIng.includes('bell pepper') || lowerIng.includes('pepper')) return '🫑';
+                        if (lowerIng.includes('mushroom')) return '🍄';
+                        if (lowerIng.includes('potato')) return '🥔';
+                        if (lowerIng.includes('rice')) return '🍚';
+                        if (lowerIng.includes('pasta')) return '🍝';
+                        if (lowerIng.includes('fish') || lowerIng.includes('salmon') || lowerIng.includes('tuna')) return '🐟';
+                        if (lowerIng.includes('beef') || lowerIng.includes('steak')) return '🥩';
+                        if (lowerIng.includes('broccoli')) return '🥦';
+                        if (lowerIng.includes('corn')) return '🌽';
+                        if (lowerIng.includes('cucumber')) return '🥒';
+                        if (lowerIng.includes('avocado')) return '🥑';
+                        if (lowerIng.includes('banana')) return '🍌';
+                        if (lowerIng.includes('orange')) return '🍊';
+                        if (lowerIng.includes('lemon')) return '🍋';
+                        if (lowerIng.includes('strawberry') || lowerIng.includes('berry')) return '🍓';
+                        if (lowerIng.includes('grapes')) return '🍇';
+                        if (lowerIng.includes('pineapple')) return '🍍';
+                        if (lowerIng.includes('watermelon')) return '🍉';
+                        if (lowerIng.includes('peach')) return '🍑';
+                        if (lowerIng.includes('flour') || lowerIng.includes('wheat')) return '🌾';
+                        if (lowerIng.includes('honey')) return '🍯';
+                        if (lowerIng.includes('oil') || lowerIng.includes('olive')) return '🫒';
+                        return '🥄'; // default ingredient icon
+                      };
+
+                      return (
+                        <button
+                          key={index}
+                          className="group px-4 py-3 bg-orange-50 border-2 border-orange-300 rounded-full text-sm font-medium text-orange-800 hover:bg-gradient-to-r hover:from-orange-400 hover:to-orange-500 hover:text-white hover:border-orange-400 transform hover:-translate-y-1 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-lg"
+                          onClick={() => {
+                            // Add click animation feedback
+                            const button = document.activeElement as HTMLButtonElement;
+                            if (button) {
+                              button.style.transform = 'scale(0.95) translateY(-2px)';
+                              setTimeout(() => {
+                                button.style.transform = '';
+                              }, 150);
+                            }
+                          }}
+                        >
+                          <span className="mr-2">{getIngredientEmoji(ingredient)}</span>
+                          {ingredient}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Cuisine Selection */}
+                <CuisinePrefs 
+                  preferences={cuisinePreferences}
+                  onChange={setCuisinePreferences}
+                />
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-8">
+                  <button
+                    onClick={handleStartOver}
+                    className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white border-2 border-orange-400 rounded-xl font-semibold text-orange-600 hover:bg-orange-50 hover:border-orange-500 hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                  >
+                    Start Over
+                  </button>
+                  <button
+                    onClick={handleGenerateRecipes}
+                    className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 hover:from-orange-600 hover:to-orange-500 active:scale-95 transform transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                  >
+                    Generate Recipes
+                  </button>
                 </div>
               </div>
-            </div>
-
-            <CuisinePrefs 
-              preferences={cuisinePreferences}
-              onChange={setCuisinePreferences}
-            />
-
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={handleStartOver}
-                className="px-6 py-3 border border-orange-300 rounded-lg font-medium text-primary hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              >
-                Start Over
-              </button>
-              <button
-                onClick={handleGenerateRecipes}
-                className="btn-primary"
-              >
-                Generate Recipes
-              </button>
             </div>
           </div>
         );
@@ -441,24 +505,6 @@ function App() {
           <main className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${currentState === 'recipe-detail' ? 'pt-8' : ''}`}>
             {renderContent()}
           </main>
-
-          {/* Footer - hide on recipe detail page */}
-          {currentState !== 'recipe-detail' && (
-            <footer className="bg-white border-t border-orange-200 mt-auto">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="text-center text-warmGray">
-                  <p className="mb-2">
-                    Made with ❤️ for better cooking experiences
-                  </p>
-                  {import.meta.env.VITE_MOCK === 'true' && (
-                    <p className="text-sm">
-                      Demo mode active - Switch to production by adding your OpenAI API key
-                    </p>
-                  )}
-                </div>
-              </div>
-            </footer>
-          )}
         </div>
       )}
 

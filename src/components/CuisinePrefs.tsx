@@ -1,6 +1,6 @@
 /**
  * CuisinePrefs Component
- * Allows users to select their preferred cuisine type
+ * Allows users to select their preferred cuisine type with warm, interactive design
  */
 
 import { useState } from 'react';
@@ -58,17 +58,17 @@ export function CuisinePrefs({ preferences, onChange }: CuisinePrefsProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4">
+    <div className="w-full space-y-6">
       <div className="text-center space-y-2">
-        <h3 className="text-lg font-semibold text-warm-700">
+        <h3 className="text-xl font-semibold text-gray-800">
           Cuisine Preference (Optional)
         </h3>
-        <p className="text-sm text-warm-600">
+        <p className="text-gray-600">
           Choose a cuisine style for your recipes
         </p>
       </div>
       
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
         {cuisineOptions.map((cuisine) => {
           const isSelected = preferences.selectedCuisine === cuisine;
           
@@ -77,16 +77,21 @@ export function CuisinePrefs({ preferences, onChange }: CuisinePrefsProps) {
               key={cuisine}
               onClick={() => handleCuisineSelect(cuisine)}
               className={`
-                px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-warm-500
+                px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-sm sm:text-base font-medium transition-all duration-200 relative overflow-hidden
+                focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
+                active:scale-95 transform
                 ${isSelected 
-                  ? 'bg-warm-100 text-warm-800 border border-warm-300' 
-                  : 'bg-white text-warm-600 border border-warm-200 hover:border-warm-300'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-lg -translate-y-1' 
+                  : 'bg-orange-50 text-orange-700 border-2 border-orange-200 hover:bg-orange-100 hover:border-orange-300 hover:-translate-y-0.5 hover:shadow-md'
                 }
               `}
               type="button"
             >
-              {cuisine}
+              {/* Animated background for selected state */}
+              {isSelected && (
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-500 opacity-0 hover:opacity-100 transition-opacity duration-200" />
+              )}
+              <span className="relative z-10">{cuisine}</span>
             </button>
           );
         })}
@@ -94,28 +99,33 @@ export function CuisinePrefs({ preferences, onChange }: CuisinePrefsProps) {
         <button
           onClick={() => handleCuisineSelect('Other')}
           className={`
-            px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-warm-500
+            px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-sm sm:text-base font-medium transition-all duration-200 relative overflow-hidden
+            focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
+            active:scale-95 transform
             ${preferences.selectedCuisine === 'Other'
-              ? 'bg-warm-100 text-warm-800 border border-warm-300' 
-              : 'bg-white text-warm-600 border border-warm-200 hover:border-warm-300'
+              ? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-lg -translate-y-1' 
+              : 'bg-orange-50 text-orange-700 border-2 border-orange-200 hover:bg-orange-100 hover:border-orange-300 hover:-translate-y-0.5 hover:shadow-md'
             }
           `}
           type="button"
         >
-          Other
+          {/* Animated background for selected state */}
+          {preferences.selectedCuisine === 'Other' && (
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-500 opacity-0 hover:opacity-100 transition-opacity duration-200" />
+          )}
+          <span className="relative z-10">Other</span>
         </button>
       </div>
 
-      {/* Custom cuisine input */}
+      {/* Custom cuisine input with animation */}
       {showCustomInput && (
-        <div className="max-w-sm mx-auto">
+        <div className="max-w-sm mx-auto animate-fade-in">
           <input
             type="text"
             placeholder="Enter cuisine type..."
             value={preferences.customCuisine}
             onChange={(e) => handleCustomCuisineChange(e.target.value)}
-            className="w-full px-4 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-warm-500 focus:border-transparent"
+            className="w-full px-4 py-3 border-2 border-orange-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-200 bg-white text-gray-800"
             autoFocus
           />
         </div>
