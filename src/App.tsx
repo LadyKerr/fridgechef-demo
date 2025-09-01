@@ -114,17 +114,17 @@ function App() {
           <div className="max-w-md mx-auto text-center space-y-8">
             {/* Header */}
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold text-primary">
+              <h1 className="title-warm">
                 FridgeChef
               </h1>
-              <p className="text-lg text-warmGray">
+              <p className="subtitle-warm">
                 Turn your fridge into inspiration 🔍
               </p>
             </div>
 
             {/* Dietary Preferences */}
             <div className="space-y-4">
-              <p className="text-sm font-medium text-warmGray">Dietary Preference:</p>
+              <p className="text-sm font-medium text-warm-700">Dietary Preference:</p>
               <DietaryPrefs 
                 preferences={dietaryPreferences}
                 onChange={setDietaryPreferences}
@@ -141,12 +141,12 @@ function App() {
                 setDetectedIngredients(['eggs', 'spinach', 'cheese', 'milk', 'bread']);
                 setCurrentState('cuisine-preferences');
               }}
-              className="w-full bg-orange-100 text-primary py-3 px-6 rounded-lg font-medium hover:bg-orange-200 transition-colors"
+              className="btn-warm-primary w-full"
             >
               Generate Recipes
             </button>
             
-            <p className="text-sm text-warmGray">
+            <p className="text-sm text-white/80">
               No recipes yet. Upload a fridge photo and click generate to get started.
             </p>
             
@@ -162,8 +162,8 @@ function App() {
         return (
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="bg-primary bg-opacity-10 p-6 rounded-full">
-                <Loader2 className="w-16 h-16 text-primary animate-spin" />
+              <div className="bg-warm-600/10 p-6 rounded-full">
+                <Loader2 className="w-16 h-16 text-warm-600 animate-spin" />
               </div>
             </div>
             <div>
@@ -226,8 +226,8 @@ function App() {
         return (
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="bg-secondary bg-opacity-10 p-6 rounded-full">
-                <ChefHat className="w-16 h-16 text-secondary animate-pulse" />
+              <div className="bg-warm-700/10 p-6 rounded-full">
+                <ChefHat className="w-16 h-16 text-warm-700 animate-pulse" />
               </div>
             </div>
             <div>
@@ -389,10 +389,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-warm-gradient flex flex-col">
       {/* Header - hide on recipe detail page */}
       {currentState !== 'recipe-detail' && (
-        <header className="bg-white shadow-sm border-b border-orange-200">
+        <header className="glassmorphism shadow-warm border-b border-warm-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* Logo */}
