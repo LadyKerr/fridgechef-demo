@@ -4,12 +4,14 @@
  */
 
 import { useState } from 'react';
-import { ChefHat, BookOpen, Loader2, ArrowLeft, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Lightbulb } from 'lucide-react';
+import { Header } from './components/Header';
 import { UploadBox } from './components/UploadBox';
 import { DietaryPrefs } from './components/DietaryPrefs';
 import { CuisinePrefs, type CuisinePreferences } from './components/CuisinePrefs';
 import { RecipeCard } from './components/RecipeCard';
 import { SavedRecipesDrawer } from './components/SavedRecipesDrawer';
+import { AnalysisLoadingScreen } from './components/AnalysisLoadingScreen';
 import { detectIngredientsFromImage, generateRecipes, type Recipe, type DietaryPreferences } from './lib/ai';
 
 // Application states
@@ -33,6 +35,9 @@ function App() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkedIngredients, setCheckedIngredients] = useState<{ [key: number]: boolean }>({});
+  const [isSaved, setIsSaved] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Handle image upload and ingredient detection
   const handleImageUpload = async (file: File) => {
@@ -75,6 +80,8 @@ function App() {
     setRecipes([]);
     setSelectedRecipe(null);
     setError(null);
+    setCheckedIngredients({});
+    setIsSaved(false);
     setDietaryPreferences({
       vegetarian: false,
       vegan: false,
@@ -104,6 +111,26 @@ function App() {
   const handleBackFromRecipe = () => {
     setSelectedRecipe(null);
     setCurrentState('results');
+    setCheckedIngredients({});
+    setIsSaved(false);
+  };
+
+  // Handle ingredient checkbox toggle
+  const handleIngredientCheck = (index: number) => {
+    setIsAnimating(true);
+    setCheckedIngredients(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+    // Reset animation state
+    setTimeout(() => setIsAnimating(false), 200);
+  };
+
+  // Handle save recipe
+  const handleSaveRecipe = () => {
+    setIsSaved(true);
+    // Reset save state after animation
+    setTimeout(() => setIsSaved(false), 2000);
   };
 
   // Render different views based on current state
@@ -111,177 +138,273 @@ function App() {
     switch (currentState) {
       case 'landing':
         return (
-          <div className="max-w-md mx-auto text-center space-y-8">
-            {/* Header */}
-            <div className="space-y-3">
-              <h1 className="text-4xl font-semibold text-primary">
-                FridgeChef
-              </h1>
-              <p className="text-lg text-warmGray">
-                Turn your fridge into inspiration 🔍
-              </p>
-            </div>
-
-            {/* Dietary Preferences */}
-            <div className="space-y-4">
-              <p className="text-sm font-medium text-warmGray">Dietary Preference:</p>
-              <DietaryPrefs 
-                preferences={dietaryPreferences}
-                onChange={setDietaryPreferences}
-              />
-            </div>
-
-            {/* Upload Area */}
-            <UploadBox onImageUpload={handleImageUpload} />
-
-            {/* Generate Button */}
-            <button 
-              onClick={() => {
-                // For demo purposes, skip directly to cuisine preferences with mock ingredients
-                setDetectedIngredients(['eggs', 'spinach', 'cheese', 'milk', 'bread']);
-                setCurrentState('cuisine-preferences');
-              }}
-              className="w-full bg-orange-100 text-primary py-3 px-6 rounded-lg font-medium hover:bg-orange-200 transition-colors"
-            >
-              Generate Recipes
-            </button>
-            
-            <p className="text-sm text-warmGray">
-              No recipes yet. Upload a fridge photo and click generate to get started.
-            </p>
-            
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-sm">{error}</p>
+          <div className="min-h-screen flex items-center justify-center px-4">
+            <div className="w-full max-w-lg">
+              {/* Hero Section */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-4" 
+                    style={{ textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}>
+                  Turn your fridge into inspiration
+                </h1>
+                <p className="text-xl text-white/90 mb-8" 
+                   style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.2)' }}>
+                  AI-powered recipe suggestions from whatever you have at home
+                </p>
+                
+                {/* Social Proof Stats */}
+                <div className="flex justify-center space-x-8 mb-12">
+                  <div className="text-center animate-float" style={{ animationDelay: '0s' }}>
+                    <div className="text-3xl font-bold text-white" 
+                         style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)' }}>50K+</div>
+                    <div className="text-white/80 text-sm">Recipe Generated</div>
+                  </div>
+                  <div className="text-center animate-float" style={{ animationDelay: '0.5s' }}>
+                    <div className="text-3xl font-bold text-white" 
+                         style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)' }}>12K+</div>
+                    <div className="text-white/80 text-sm">Happy Users</div>
+                  </div>
+                  <div className="text-center animate-float" style={{ animationDelay: '1s' }}>
+                    <div className="text-3xl font-bold text-white flex items-center justify-center" 
+                         style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)' }}>
+                      4.8★
+                    </div>
+                    <div className="text-white/80 text-sm">User Rating</div>
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* Main App Card */}
+              <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20">
+                {/* Dietary Preferences */}
+                <div className="mb-8">
+                  <p className="text-gray-700 font-medium mb-4">Dietary Preferences:</p>
+                  <DietaryPrefs 
+                    preferences={dietaryPreferences}
+                    onChange={setDietaryPreferences}
+                  />
+                </div>
+
+                {/* Upload Area */}
+                <div className="mb-8">
+                  <UploadBox onImageUpload={handleImageUpload} />
+                </div>
+
+                {/* Generate Button */}
+                <button 
+                  onClick={() => {
+                    // Show the loading screen first, then proceed to cuisine preferences
+                    setDetectedIngredients(['eggs', 'spinach', 'cheese', 'milk', 'bread']);
+                    setCurrentState('uploading');
+                  }}
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transform transition-all duration-300"
+                >
+                  Generate Recipes
+                </button>
+
+                {/* Example Recipe Previews */}
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <p className="text-gray-600 text-sm mb-4 flex items-center">
+                    💡 What you could create:
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-700 font-medium">Mediterranean Pasta Bowl</span>
+                      <span className="text-gray-500">Tomatoes, basil, cheese, pasta</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-700 font-medium">Quick Veggie Stir-Fry</span>
+                      <span className="text-gray-500">Bell peppers, onions, soy sauce</span>
+                    </div>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-4 text-center">
+                    Upload a photo of your fridge contents and we'll suggest delicious recipes you can make right now!
+                  </p>
+                </div>
+                
+                {error && (
+                  <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">{error}</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         );
 
       case 'uploading':
         return (
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="bg-primary bg-opacity-10 p-6 rounded-full">
-                <Loader2 className="w-16 h-16 text-primary animate-spin" />
-              </div>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-primary mb-2">
-                Analyzing Your Fridge
-              </h2>
-              <p className="text-warmGray">
-                Our AI is identifying ingredients from your photo...
-              </p>
-            </div>
-          </div>
+          <AnalysisLoadingScreen 
+            onComplete={() => setCurrentState('cuisine-preferences')}
+          />
         );
 
       case 'cuisine-preferences':
         return (
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-primary mb-4">
-                Great! We found these ingredients:
-              </h2>
-              
-              {/* Detected ingredients */}
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-8">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {detectedIngredients.map((ingredient, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-white border border-orange-300 rounded-full text-sm font-medium text-primary"
-                    >
-                      {ingredient}
-                    </span>
-                  ))}
+          <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 pt-5">
+            <div className="w-full max-w-3xl">
+              {/* Success Header with animated icon */}
+              <div className="text-center mb-8">
+                <div className="text-6xl mb-4 animate-celebration-bounce">
+                  🎉
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4" 
+                    style={{ textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}>
+                  Great! We found these ingredients:
+                </h1>
+              </div>
+
+              {/* White card with ingredients */}
+              <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20 mb-8">
+                {/* Ingredients Display */}
+                <div className="mb-8">
+                  <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
+                    {detectedIngredients.map((ingredient, index) => {
+                      // Add emojis to common ingredients
+                      const getIngredientEmoji = (ing: string) => {
+                        const lowerIng = ing.toLowerCase();
+                        if (lowerIng.includes('apple')) return '🍎';
+                        if (lowerIng.includes('carrot')) return '🥕';
+                        if (lowerIng.includes('chicken') || lowerIng.includes('meat')) return '🍗';
+                        if (lowerIng.includes('cheese')) return '🧀';
+                        if (lowerIng.includes('egg')) return '🥚';
+                        if (lowerIng.includes('spinach') || lowerIng.includes('lettuce') || lowerIng.includes('salad')) return '🥬';
+                        if (lowerIng.includes('milk')) return '🥛';
+                        if (lowerIng.includes('bread')) return '🍞';
+                        if (lowerIng.includes('tomato')) return '🍅';
+                        if (lowerIng.includes('onion')) return '🧅';
+                        if (lowerIng.includes('garlic')) return '🧄';
+                        if (lowerIng.includes('bell pepper') || lowerIng.includes('pepper')) return '🫑';
+                        if (lowerIng.includes('mushroom')) return '🍄';
+                        if (lowerIng.includes('potato')) return '🥔';
+                        if (lowerIng.includes('rice')) return '🍚';
+                        if (lowerIng.includes('pasta')) return '🍝';
+                        if (lowerIng.includes('fish') || lowerIng.includes('salmon') || lowerIng.includes('tuna')) return '🐟';
+                        if (lowerIng.includes('beef') || lowerIng.includes('steak')) return '🥩';
+                        if (lowerIng.includes('broccoli')) return '🥦';
+                        if (lowerIng.includes('corn')) return '🌽';
+                        if (lowerIng.includes('cucumber')) return '🥒';
+                        if (lowerIng.includes('avocado')) return '🥑';
+                        if (lowerIng.includes('banana')) return '🍌';
+                        if (lowerIng.includes('orange')) return '🍊';
+                        if (lowerIng.includes('lemon')) return '🍋';
+                        if (lowerIng.includes('strawberry') || lowerIng.includes('berry')) return '🍓';
+                        if (lowerIng.includes('grapes')) return '🍇';
+                        if (lowerIng.includes('pineapple')) return '🍍';
+                        if (lowerIng.includes('watermelon')) return '🍉';
+                        if (lowerIng.includes('peach')) return '🍑';
+                        if (lowerIng.includes('flour') || lowerIng.includes('wheat')) return '🌾';
+                        if (lowerIng.includes('honey')) return '🍯';
+                        if (lowerIng.includes('oil') || lowerIng.includes('olive')) return '🫒';
+                        return '🥄'; // default ingredient icon
+                      };
+
+                      return (
+                        <button
+                          key={index}
+                          className="group px-4 py-3 bg-orange-50 border-2 border-orange-300 rounded-full text-sm font-medium text-orange-800 hover:bg-gradient-to-r hover:from-orange-400 hover:to-orange-500 hover:text-white hover:border-orange-400 transform hover:-translate-y-1 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-lg"
+                          onClick={() => {
+                            // Add click animation feedback
+                            const button = document.activeElement as HTMLButtonElement;
+                            if (button) {
+                              button.style.transform = 'scale(0.95) translateY(-2px)';
+                              setTimeout(() => {
+                                button.style.transform = '';
+                              }, 150);
+                            }
+                          }}
+                        >
+                          <span className="mr-2">{getIngredientEmoji(ingredient)}</span>
+                          {ingredient}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Cuisine Selection */}
+                <CuisinePrefs 
+                  preferences={cuisinePreferences}
+                  onChange={setCuisinePreferences}
+                />
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-8">
+                  <button
+                    onClick={handleStartOver}
+                    className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white border-2 border-orange-400 rounded-xl font-semibold text-orange-600 hover:bg-orange-50 hover:border-orange-500 hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                  >
+                    Start Over
+                  </button>
+                  <button
+                    onClick={handleGenerateRecipes}
+                    className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 hover:from-orange-600 hover:to-orange-500 active:scale-95 transform transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                  >
+                    Generate Recipes
+                  </button>
                 </div>
               </div>
-            </div>
-
-            <CuisinePrefs 
-              preferences={cuisinePreferences}
-              onChange={setCuisinePreferences}
-            />
-
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={handleStartOver}
-                className="px-6 py-3 border border-orange-300 rounded-lg font-medium text-primary hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              >
-                Start Over
-              </button>
-              <button
-                onClick={handleGenerateRecipes}
-                className="btn-primary"
-              >
-                Generate Recipes
-              </button>
             </div>
           </div>
         );
 
       case 'generating':
         return (
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="bg-secondary bg-opacity-10 p-6 rounded-full">
-                <ChefHat className="w-16 h-16 text-secondary animate-pulse" />
-              </div>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-primary mb-2">
-                Cooking Up Recipes
-              </h2>
-              <p className="text-warmGray">
-                Our AI chef is creating personalized recipes for you...
-              </p>
-            </div>
-          </div>
+          <AnalysisLoadingScreen 
+            mode="generating"
+            onComplete={() => setCurrentState('results')}
+          />
         );
 
       case 'results':
         return (
-          <div className="max-w-6xl mx-auto space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-primary mb-4">
-                Here are your personalized recipes!
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Based on your ingredients and dietary preferences
-              </p>
-              
-              <button
-                onClick={handleStartOver}
-                className="btn-secondary mb-8"
-              >
-                Create New Recipes
-              </button>
-            </div>
+          <div className="min-h-screen py-8 px-4">
+            <div className="max-w-6xl mx-auto">
+              {/* Header Section */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 animate-fade-in" 
+                    style={{ textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}>
+                  Here are your personalized recipes!
+                </h1>
+                <p className="text-xl text-white/90 mb-8" 
+                   style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.2)' }}>
+                  Based on your ingredients and dietary preferences
+                </p>
+                
+                <button
+                  onClick={handleStartOver}
+                  className="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all duration-200 border-2 border-white/20 hover:border-white/30"
+                >
+                  <span className="relative z-10">Create New Recipes</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                </button>
+              </div>
 
-            {recipes.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">No recipes found. Try adjusting your preferences or uploading a different image.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recipes.map((recipe) => (
-                  <div 
-                    key={recipe.id} 
-                    onClick={() => handleViewRecipe(recipe)}
-                    className="cursor-pointer"
-                  >
-                    <RecipeCard
-                      recipe={recipe}
-                      onSaveToggle={() => {
-                        // Optional: Could trigger a notification here
-                      }}
-                    />
+              {recipes.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 max-w-md mx-auto">
+                    <p className="text-white text-lg">No recipes found. Try adjusting your preferences or uploading a different image.</p>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recipes.map((recipe, index) => (
+                    <div 
+                      key={recipe.id} 
+                      onClick={() => handleViewRecipe(recipe)}
+                      className="cursor-pointer animate-fade-in-up"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <RecipeCard
+                        recipe={recipe}
+                        onSaveToggle={() => {
+                          // Optional: Could trigger a notification here
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         );
 
@@ -289,94 +412,146 @@ function App() {
         if (!selectedRecipe) return null;
         
         return (
-          <div className="max-w-2xl mx-auto space-y-6">
-            {/* Back button */}
-            <button
-              onClick={handleBackFromRecipe}
-              className="flex items-center space-x-2 text-warmGray hover:text-primary transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back to recipes</span>
-            </button>
-
-            {/* Recipe header */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <h1 className="text-3xl font-semibold text-primary">
-                  {selectedRecipe.title}
-                </h1>
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Header Card */}
+            <div className="bg-white rounded-xl shadow-lg border-t-4 border-orange-400 p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                {/* Back Button */}
                 <button
-                  className="p-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors"
+                  onClick={handleBackFromRecipe}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-orange-500 bg-orange-50 hover:bg-orange-100 px-4 py-2 rounded-lg transition-all duration-200 hover:-translate-x-1 self-start"
                 >
-                  Save
+                  <ArrowLeft className="w-5 h-5" />
+                  <span>Back to recipes</span>
+                </button>
+
+                {/* Save Button */}
+                <button
+                  onClick={handleSaveRecipe}
+                  className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
+                    isSaved 
+                      ? 'bg-gradient-to-r from-green-400 to-green-500 text-white' 
+                      : 'bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white shadow-lg hover:shadow-xl'
+                  }`}
+                >
+                  {isSaved ? '✓ Saved!' : 'Save Recipe'}
                 </button>
               </div>
-              
-              <p className="text-warmGray">
-                {selectedRecipe.description}
-              </p>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2">
-                {selectedRecipe.dietary?.map((diet) => (
-                  <span
-                    key={diet}
-                    className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full"
-                  >
-                    {diet}
+              {/* Recipe Title & Description */}
+              <div className="space-y-4">
+                <h1 className="text-3xl sm:text-4xl font-bold text-orange-600">
+                  {selectedRecipe.title}
+                </h1>
+                
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  {selectedRecipe.description}
+                </p>
+
+                {/* Meta Tags */}
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-4 py-2 bg-orange-100 text-orange-700 font-medium rounded-full border border-orange-200">
+                    ⏱️ {selectedRecipe.cookTime}
                   </span>
-                ))}
-                <span className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full">
-                  {selectedRecipe.cookTime}
-                </span>
-                <span className="px-3 py-1 bg-orange-100 text-primary text-sm font-medium rounded-full">
-                  {selectedRecipe.difficulty}
-                </span>
+                  <span className={`px-4 py-2 font-medium rounded-full ${
+                    selectedRecipe.difficulty === 'easy' ? 'bg-green-100 text-green-700 border border-green-200' :
+                    selectedRecipe.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                    'bg-red-100 text-red-700 border border-red-200'
+                  }`}>
+                    {selectedRecipe.difficulty.charAt(0).toUpperCase() + selectedRecipe.difficulty.slice(1)}
+                  </span>
+                  {selectedRecipe.dietary?.map((diet) => (
+                    <span
+                      key={diet}
+                      className="px-4 py-2 bg-orange-50 text-orange-600 font-medium rounded-full border border-orange-200"
+                    >
+                      {diet}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Recipe image placeholder */}
-            <div className="w-full h-48 bg-orange-50 rounded-lg flex items-center justify-center border-2 border-dashed border-orange-300">
-              <p className="text-primary font-medium">Recipe image placeholder</p>
+            {/* Recipe Image Placeholder */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="w-full h-64 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center border-2 border-dashed border-orange-300">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🍽️</div>
+                  <p className="text-orange-500 font-medium">Recipe image placeholder</p>
+                </div>
+              </div>
             </div>
 
-            {/* Ingredients and Steps */}
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Ingredients */}
-              <div>
-                <h2 className="text-xl font-semibold text-primary mb-4">Ingredients</h2>
-                <ul className="space-y-2">
+            {/* Ingredients and Steps Grid */}
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Ingredients Section */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span className="text-2xl mr-2">🥘</span>
+                  Ingredients
+                </h2>
+                <div className="space-y-3">
                   {selectedRecipe.ingredients.map((ingredient, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-orange-400 mr-2">•</span>
-                      <span className="text-warmGray">{ingredient}</span>
-                    </li>
+                    <div
+                      key={index}
+                      className="group flex items-center bg-orange-50 border-l-4 border-orange-400 p-4 rounded-lg hover:translate-x-2 transition-all duration-200 cursor-pointer"
+                      onClick={() => handleIngredientCheck(index)}
+                    >
+                      {/* Custom Checkbox */}
+                      <div className={`relative w-5 h-5 mr-4 border-2 rounded transition-all duration-200 ${
+                        checkedIngredients[index] 
+                          ? 'bg-orange-500 border-orange-500' 
+                          : 'border-orange-400 hover:border-orange-500'
+                      } ${isAnimating ? 'animate-pulse' : ''}`}>
+                        {checkedIngredients[index] && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <span className={`text-gray-700 ${checkedIngredients[index] ? 'line-through text-gray-400' : ''}`}>
+                        {ingredient}
+                      </span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {/* Steps */}
-              <div>
-                <h2 className="text-xl font-semibold text-primary mb-4">Steps</h2>
-                <ol className="space-y-3">
+              {/* Steps Section */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span className="text-2xl mr-2">👩‍🍳</span>
+                  Steps
+                </h2>
+                <div className="space-y-4">
                   {selectedRecipe.instructions.map((instruction, index) => (
-                    <li key={index} className="flex">
-                      <span className="bg-orange-200 text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-3 mt-0.5 flex-shrink-0">
+                    <div key={index} className="flex">
+                      {/* Step Number */}
+                      <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-1 flex-shrink-0 shadow-lg">
                         {index + 1}
-                      </span>
-                      <span className="text-warmGray">{instruction}</span>
-                    </li>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800 mb-1">Step {index + 1}</h3>
+                        <p className="text-gray-600 leading-relaxed">{instruction}</p>
+                      </div>
+                    </div>
                   ))}
-                </ol>
+                </div>
               </div>
             </div>
 
-            {/* Tip section */}
-            <div className="bg-yellow-25 border border-yellow-100 rounded-lg p-4" style={{ backgroundColor: '#fefce8' }}>
-              <div className="flex items-start space-x-2">
-                <Lightbulb className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                <p className="text-yellow-800">
-                  <span className="font-medium">Tip:</span> No cheddar? Use feta or mozzarella.
+            {/* Tip Section */}
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 relative">
+              {/* Lightbulb positioned at top border */}
+              <div className="absolute -top-3 left-6 bg-orange-100 p-2 rounded-full border border-orange-200">
+                <Lightbulb className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="pt-2">
+                <h3 className="font-bold text-orange-700 mb-2">Chef's Tip</h3>
+                <p className="text-gray-700">
+                  No cheddar? Try feta or mozzarella for a delicious variation. Feel free to adjust spices to your taste!
                 </p>
               </div>
             </div>
@@ -389,39 +564,35 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header - hide on recipe detail page */}
-      {currentState !== 'recipe-detail' && (
-        <header className="bg-white shadow-sm border-b border-orange-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              {/* Logo */}
-              <button 
-                onClick={handleStartOver}
-                className="flex items-center space-x-2 text-xl font-bold text-primary hover:text-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
-              >
-                <ChefHat className="w-8 h-8 text-primary" />
-                <span>FridgeChef</span>
-              </button>
+    <>
+      {currentState === 'landing' || currentState === 'uploading' || currentState === 'generating' ? (
+        // Full-screen pages (landing, loading screens)
+        <div className="min-h-screen">
+          {currentState === 'landing' && (
+            <Header 
+              onLogoClick={handleStartOver}
+              onMyRecipesClick={() => setIsDrawerOpen(true)}
+              isMyRecipesActive={isDrawerOpen}
+            />
+          )}
+          {renderContent()}
+        </div>
+      ) : (
+        // App layout for other pages
+        <div className="min-h-screen bg-warm-gradient flex flex-col">
+          {/* Header for all pages */}
+          <Header 
+            onLogoClick={handleStartOver}
+            onMyRecipesClick={() => setIsDrawerOpen(true)}
+            isMyRecipesActive={isDrawerOpen}
+          />
 
-              {/* Navigation */}
-              <button
-                onClick={() => setIsDrawerOpen(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                aria-label="Open saved recipes"
-              >
-                <BookOpen className="w-5 h-5 text-primary" />
-                <span className="font-medium text-primary">My Recipes</span>
-              </button>
-            </div>
-          </div>
-        </header>
+          {/* Main content */}
+          <main className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${currentState === 'recipe-detail' ? 'pt-8' : ''}`}>
+            {renderContent()}
+          </main>
+        </div>
       )}
-
-      {/* Main content */}
-      <main className={`flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${currentState === 'recipe-detail' ? 'pt-8' : ''}`}>
-        {renderContent()}
-      </main>
 
       {/* Saved recipes drawer */}
       <SavedRecipesDrawer 
@@ -429,25 +600,7 @@ function App() {
         onClose={() => setIsDrawerOpen(false)}
         onRecipeClick={handleViewSavedRecipe}
       />
-
-      {/* Footer - hide on recipe detail page */}
-      {currentState !== 'recipe-detail' && (
-        <footer className="bg-white border-t border-orange-200 mt-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center text-warmGray">
-              <p className="mb-2">
-                Made with ❤️ for better cooking experiences
-              </p>
-              {import.meta.env.VITE_MOCK === 'true' && (
-                <p className="text-sm">
-                  Demo mode active - Switch to production by adding your OpenAI API key
-                </p>
-              )}
-            </div>
-          </div>
-        </footer>
-      )}
-    </div>
+    </>
   );
 }
 

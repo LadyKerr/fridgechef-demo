@@ -95,6 +95,15 @@ src/
 
 ## Key Components
 
+### Header
+- Sticky navigation with glassmorphism design
+- Premium warm orange branding
+- Logo with hover animations and chef hat icon
+- "My Recipes" button with interactive states
+- Responsive layout (mobile/desktop)
+- Accessibility features (focus states, ARIA labels)
+- Smooth transitions and micro-interactions
+
 ### UploadBox
 - Drag & drop image upload
 - File validation (type, size)
