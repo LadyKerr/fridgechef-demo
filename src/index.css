@@ -188,8 +188,8 @@ body {
 }
 
 @keyframes slideOutRight {
-  from { transform: translateX(0); }
-  to { transform: translateX(100%); }
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
 }
 
 @keyframes glow {
@@ -260,6 +260,19 @@ body {
 
 .animate-bounce-cooking {
   animation: cookingBounce 2s ease-in-out infinite;
+}
+
+/* Additional animations for saved recipes modal */
+.animate-slide-out-right {
+  animation: slideOutRight 0.3s ease-in-out forwards;
+}
+
+/* Responsive modal styles */
+@media (max-width: 640px) {
+  .side-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 /* Custom animations for recipe detail interactions */
