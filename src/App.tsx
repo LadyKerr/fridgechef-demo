@@ -454,11 +454,11 @@ function App() {
                     ⏱️ {selectedRecipe.cookTime}
                   </span>
                   <span className={`px-4 py-2 font-medium rounded-full ${
-                    selectedRecipe.difficulty === 'Easy' ? 'bg-green-100 text-green-700 border border-green-200' :
-                    selectedRecipe.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                    selectedRecipe.difficulty === 'easy' ? 'bg-green-100 text-green-700 border border-green-200' :
+                    selectedRecipe.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
                     'bg-red-100 text-red-700 border border-red-200'
                   }`}>
-                    {selectedRecipe.difficulty}
+                    {selectedRecipe.difficulty.charAt(0).toUpperCase() + selectedRecipe.difficulty.slice(1)}
                   </span>
                   {selectedRecipe.dietary?.map((diet) => (
                     <span
